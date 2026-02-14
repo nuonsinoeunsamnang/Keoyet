@@ -18,6 +18,9 @@ export const updateTenderBody = z.object({
   status: z.enum(["draft", "published"]).optional(),
   submission_deadline: z.string().datetime().optional().nullable(),
   submission_link_note: z.string().optional().nullable(),
+  reference_id: z.string().optional().nullable(),
+  category: z.string().optional().nullable(),
+  delivery_location: z.string().optional().nullable(),
 });
 export type UpdateTenderBody = z.infer<typeof updateTenderBody>;
 

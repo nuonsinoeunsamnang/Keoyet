@@ -2,6 +2,7 @@ import { ButtonHTMLAttributes } from "react";
 
 export function Button({
   children,
+  style,
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
@@ -10,6 +11,7 @@ export function Button({
         padding: "0.5rem 1rem",
         cursor: props.disabled ? "not-allowed" : "pointer",
         opacity: props.disabled ? 0.6 : 1,
+        ...style,
       }}
       {...props}
     >

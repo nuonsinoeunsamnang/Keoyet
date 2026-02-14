@@ -133,18 +133,22 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists tenders_updated_at on public.tenders;
 create trigger tenders_updated_at
   before update on public.tenders
   for each row execute function public.set_updated_at();
 
+drop trigger if exists vendors_updated_at on public.vendors;
 create trigger vendors_updated_at
   before update on public.vendors
   for each row execute function public.set_updated_at();
 
+drop trigger if exists submissions_updated_at on public.submissions;
 create trigger submissions_updated_at
   before update on public.submissions
   for each row execute function public.set_updated_at();
 
+drop trigger if exists submission_docs_updated_at on public.submission_docs;
 create trigger submission_docs_updated_at
   before update on public.submission_docs
   for each row execute function public.set_updated_at();

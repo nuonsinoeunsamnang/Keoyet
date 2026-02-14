@@ -9,6 +9,9 @@ export type Tender = {
   description: string | null;
   submission_deadline: string | null;
   submission_link_note: string | null;
+  reference_id: string | null;
+  category: string | null;
+  delivery_location: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -98,7 +101,7 @@ export async function createTender(
 export async function updateTender(
   tenderId: string,
   workspaceId: string,
-  updates: Partial<Pick<Tender, "title" | "description" | "status" | "submission_deadline" | "submission_link_note">>
+  updates: Partial<Pick<Tender, "title" | "description" | "status" | "submission_deadline" | "submission_link_note" | "reference_id" | "category" | "delivery_location">>
 ): Promise<Tender | null> {
   const supabase = getSupabase();
   const { data, error } = await supabase

@@ -12,6 +12,22 @@ export type Vendor = {
   updated_at: string;
 };
 
+export async function getVendorsByWorkspace(
+  workspaceId: string,
+  opts?: { status?: string }
+): Promise<Vendor[]> {
+  const supabase = getSupabase();
+  let q = supabase
+    .from("vendors")
+    .select("*")
+    .eq("workspace_id", workspaceId)
+    .order("created_at", { ascending: false });
+  if (opts?.status) q = q.eq("status", opts.status);
+  const { data, error } = await q;
+  if (error) throw error;
+  return (data ?? []) as Vendor[];
+}
+
 export async function getVendorsByTender(
   tenderId: string,
   workspaceId: string
