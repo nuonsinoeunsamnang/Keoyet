@@ -21,6 +21,11 @@ export const updateTenderBody = z.object({
   reference_id: z.string().optional().nullable(),
   category: z.string().optional().nullable(),
   delivery_location: z.string().optional().nullable(),
+  publish_at: z.string().datetime().optional().nullable(),
+  questions_deadline: z.string().datetime().optional().nullable(),
+  accept_online_submissions: z.boolean().optional(),
+  accept_physical_submissions: z.boolean().optional(),
+  physical_submission_instructions: z.string().optional().nullable(),
 });
 export type UpdateTenderBody = z.infer<typeof updateTenderBody>;
 
@@ -32,6 +37,11 @@ export const tenderItemSchema = z.object({
   quantity: z.number().min(0),
   unit: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
+  image_url: z
+    .union([z.string().url(), z.literal("")])
+    .optional()
+    .nullable()
+    .transform((v) => (v === "" ? null : v)),
 });
 export const putTenderItemsBody = z.object({
   items: z.array(tenderItemSchema),

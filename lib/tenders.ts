@@ -12,6 +12,11 @@ export type Tender = {
   reference_id: string | null;
   category: string | null;
   delivery_location: string | null;
+  publish_at: string | null;
+  questions_deadline: string | null;
+  accept_online_submissions?: boolean;
+  accept_physical_submissions?: boolean;
+  physical_submission_instructions: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -24,6 +29,7 @@ export type TenderItem = {
   quantity: number;
   unit: string | null;
   notes: string | null;
+  image_url: string | null;
   created_at: string;
 };
 
@@ -101,7 +107,7 @@ export async function createTender(
 export async function updateTender(
   tenderId: string,
   workspaceId: string,
-  updates: Partial<Pick<Tender, "title" | "description" | "status" | "submission_deadline" | "submission_link_note" | "reference_id" | "category" | "delivery_location">>
+  updates: Partial<Pick<Tender, "title" | "description" | "status" | "submission_deadline" | "submission_link_note" | "reference_id" | "category" | "delivery_location" | "publish_at" | "questions_deadline" | "accept_online_submissions" | "accept_physical_submissions" | "physical_submission_instructions">>
 ): Promise<Tender | null> {
   const supabase = getSupabase();
   const { data, error } = await supabase
@@ -141,6 +147,7 @@ export async function replaceTenderItems(
     quantity: number;
     unit?: string | null;
     notes?: string | null;
+    image_url?: string | null;
   }>
 ): Promise<void> {
   const supabase = getSupabase();
@@ -154,6 +161,7 @@ export async function replaceTenderItems(
       quantity: item.quantity ?? 1,
       unit: item.unit ?? null,
       notes: item.notes ?? null,
+      image_url: item.image_url ?? null,
     }))
   );
   if (error) throw error;
