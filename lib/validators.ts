@@ -26,6 +26,9 @@ export const updateTenderBody = z.object({
   accept_online_submissions: z.boolean().optional(),
   accept_physical_submissions: z.boolean().optional(),
   physical_submission_instructions: z.string().optional().nullable(),
+  eligibility_requirements: z.string().optional().nullable(),
+  rejection_criteria: z.record(z.boolean()).optional().nullable(),
+  only_verified_vendors: z.boolean().optional(),
 });
 export type UpdateTenderBody = z.infer<typeof updateTenderBody>;
 

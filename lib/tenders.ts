@@ -17,6 +17,9 @@ export type Tender = {
   accept_online_submissions?: boolean;
   accept_physical_submissions?: boolean;
   physical_submission_instructions: string | null;
+  eligibility_requirements: string | null;
+  rejection_criteria: Record<string, boolean> | null;
+  only_verified_vendors: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -107,7 +110,7 @@ export async function createTender(
 export async function updateTender(
   tenderId: string,
   workspaceId: string,
-  updates: Partial<Pick<Tender, "title" | "description" | "status" | "submission_deadline" | "submission_link_note" | "reference_id" | "category" | "delivery_location" | "publish_at" | "questions_deadline" | "accept_online_submissions" | "accept_physical_submissions" | "physical_submission_instructions">>
+  updates: Partial<Pick<Tender, "title" | "description" | "status" | "submission_deadline" | "submission_link_note" | "reference_id" | "category" | "delivery_location" | "publish_at" | "questions_deadline" | "accept_online_submissions" | "accept_physical_submissions" | "physical_submission_instructions" | "eligibility_requirements" | "rejection_criteria" | "only_verified_vendors">>
 ): Promise<Tender | null> {
   const supabase = getSupabase();
   const { data, error } = await supabase
