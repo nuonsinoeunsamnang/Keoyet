@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getTendersByWorkspace } from "@/lib/tenders";
 import { getOrgByKey } from "@/lib/org";
 
+export const dynamic = "force-dynamic";
+
 export default async function TendersListPage({
   params,
 }: {

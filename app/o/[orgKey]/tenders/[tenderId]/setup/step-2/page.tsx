@@ -92,6 +92,7 @@ export default function SetupStep2Page() {
   const [physicalInstructions, setPhysicalInstructions] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/o/${orgKey}/tenders/${tenderId}`);
@@ -133,8 +134,9 @@ export default function SetupStep2Page() {
   const timeRemainingDays = daysUntil(submissionDeadlineIso);
 
   async function saveDraft() {
+    setSaveError(null);
     setSaving(true);
-    await fetch(`/api/o/${orgKey}/tenders/${tenderId}`, {
+    const res = await fetch(`/api/o/${orgKey}/tenders/${tenderId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -148,12 +150,17 @@ export default function SetupStep2Page() {
       }),
     });
     setSaving(false);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      setSaveError(err?.error ?? "Failed to save. Please try again.");
+    }
   }
 
   async function saveAndContinue(e: React.FormEvent) {
     e.preventDefault();
+    setSaveError(null);
     setSaving(true);
-    await fetch(`/api/o/${orgKey}/tenders/${tenderId}`, {
+    const res = await fetch(`/api/o/${orgKey}/tenders/${tenderId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -167,6 +174,11 @@ export default function SetupStep2Page() {
       }),
     });
     setSaving(false);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      setSaveError(err?.error ?? "Failed to save. Please try again.");
+      return;
+    }
     router.push(`${base}/step-3`);
   }
 
@@ -238,6 +250,11 @@ export default function SetupStep2Page() {
             Set deadlines and enable online submissions.
           </p>
         </div>
+        {saveError && (
+          <p style={{ margin: 0, color: "#b91c1c", fontSize: "0.875rem", width: "100%" }}>
+            {saveError}
+          </p>
+        )}
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
           <Button
             type="button"

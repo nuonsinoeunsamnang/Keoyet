@@ -110,6 +110,7 @@ export default function SetupStep4Page() {
   const [onlyVerifiedVendors, setOnlyVerifiedVendors] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const [tenderRes, docsRes] = await Promise.all([
@@ -184,8 +185,9 @@ export default function SetupStep4Page() {
   ].map((name, i) => ({ name, required: true, sort_order: i }));
 
   async function saveDraft() {
+    setSaveError(null);
     setSaving(true);
-    await fetch(`/api/o/${orgKey}/tenders/${tenderId}`, {
+    const patchRes = await fetch(`/api/o/${orgKey}/tenders/${tenderId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -194,18 +196,29 @@ export default function SetupStep4Page() {
         only_verified_vendors: onlyVerifiedVendors,
       }),
     });
-    await fetch(`/api/o/${orgKey}/tenders/${tenderId}/required-docs`, {
+    if (!patchRes.ok) {
+      setSaving(false);
+      const err = await patchRes.json().catch(() => ({}));
+      setSaveError(err?.error ?? "Failed to save. Please try again.");
+      return;
+    }
+    const putRes = await fetch(`/api/o/${orgKey}/tenders/${tenderId}/required-docs`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ docs: builtDocs }),
     });
     setSaving(false);
+    if (!putRes.ok) {
+      const err = await putRes.json().catch(() => ({}));
+      setSaveError(err?.error ?? "Failed to save documents. Please try again.");
+    }
   }
 
   async function saveAndContinue(e: React.FormEvent) {
     e.preventDefault();
+    setSaveError(null);
     setSaving(true);
-    await fetch(`/api/o/${orgKey}/tenders/${tenderId}`, {
+    const patchRes = await fetch(`/api/o/${orgKey}/tenders/${tenderId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -214,12 +227,23 @@ export default function SetupStep4Page() {
         only_verified_vendors: onlyVerifiedVendors,
       }),
     });
-    await fetch(`/api/o/${orgKey}/tenders/${tenderId}/required-docs`, {
+    if (!patchRes.ok) {
+      setSaving(false);
+      const err = await patchRes.json().catch(() => ({}));
+      setSaveError(err?.error ?? "Failed to save. Please try again.");
+      return;
+    }
+    const putRes = await fetch(`/api/o/${orgKey}/tenders/${tenderId}/required-docs`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ docs: builtDocs }),
     });
     setSaving(false);
+    if (!putRes.ok) {
+      const err = await putRes.json().catch(() => ({}));
+      setSaveError(err?.error ?? "Failed to save documents. Please try again.");
+      return;
+    }
     router.push(`${base}/step-5`);
   }
 
@@ -281,6 +305,11 @@ export default function SetupStep4Page() {
             Define document requirements and compliance rules.
           </p>
         </div>
+        {saveError && (
+          <p style={{ margin: 0, color: "#b91c1c", fontSize: "0.875rem", width: "100%" }}>
+            {saveError}
+          </p>
+        )}
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
           <Button
             type="button"

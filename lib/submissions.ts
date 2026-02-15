@@ -12,7 +12,12 @@ export type Submission = {
 };
 
 export type SubmissionWithVendor = Submission & {
-  vendors: { id: string; name: string; contact_email: string | null } | null;
+  vendors: {
+    id: string;
+    name: string;
+    contact_email: string | null;
+    status?: string;
+  } | null;
 };
 
 export async function getSubmissionsByTender(
@@ -21,7 +26,7 @@ export async function getSubmissionsByTender(
   const supabase = getSupabase();
   const { data, error } = await supabase
     .from("submissions")
-    .select("*, vendors(id, name, contact_email)")
+    .select("*, vendors(id, name, contact_email, status)")
     .eq("tender_id", tenderId)
     .order("created_at", { ascending: false });
   if (error) throw error;

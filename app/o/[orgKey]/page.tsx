@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { unstable_noStore } from "next/cache";
 import {
   getDashboardWorkQueueCounts,
   getTendersWithMeta,
@@ -8,11 +9,16 @@ import { theme } from "@/lib/theme";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { TenderListTable } from "@/components/dashboard/TenderListTable";
+import { DashboardTenderList } from "@/components/dashboard/DashboardTenderList";
+
+export const dynamic = "force-dynamic";
+
 export default async function OrgDashboardPage({
   params,
 }: {
   params: Promise<{ orgKey: string }>;
 }) {
+  unstable_noStore();
   const { orgKey } = await params;
   const org = await getOrgByKey(orgKey);
   if (!org) return null;
@@ -308,27 +314,7 @@ export default async function OrgDashboardPage({
           </div>
       </section>
 
-      <section>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "0.75rem",
-          }}
-        >
-          <h2
-            style={{
-              margin: 0,
-              fontSize: "1rem",
-              fontWeight: 600,
-            }}
-          >
-            Tender List
-          </h2>
-        </div>
-        <TenderListTable tenders={tenders} orgKey={orgKey} />
-      </section>
+      <DashboardTenderList tenders={tenders} orgKey={orgKey} />
     </div>
   );
 }

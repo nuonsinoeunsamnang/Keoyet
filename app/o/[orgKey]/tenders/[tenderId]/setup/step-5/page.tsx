@@ -115,6 +115,7 @@ export default function SetupStep5Page() {
   const [requiredDocs, setRequiredDocs] = useState<RequiredDoc[]>([]);
   const [loading, setLoading] = useState(true);
   const [publishing, setPublishing] = useState(false);
+  const [publishError, setPublishError] = useState<string | null>(null);
   const [overviewExpanded, setOverviewExpanded] = useState(false);
 
   const load = useCallback(async () => {
@@ -148,11 +149,15 @@ export default function SetupStep5Page() {
   }
 
   async function handlePublish() {
+    setPublishError(null);
     setPublishing(true);
     const res = await fetch(`/api/o/${orgKey}/tenders/${tenderId}/publish`, { method: "POST" });
     setPublishing(false);
     if (res.ok) {
       router.push(`/o/${orgKey}/tenders/${tenderId}/manage/submissions`);
+    } else {
+      const err = await res.json().catch(() => ({}));
+      setPublishError(err?.error ?? "Failed to publish. Please try again.");
     }
   }
 
@@ -285,6 +290,11 @@ export default function SetupStep5Page() {
           </Button>
         </div>
       </div>
+      {publishError && (
+        <p style={{ margin: 0, marginBottom: "1rem", color: "#b91c1c", fontSize: "0.875rem" }}>
+          {publishError}
+        </p>
+      )}
 
       {/* Tender pill + ref + status */}
       <div

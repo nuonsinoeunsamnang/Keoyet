@@ -32,11 +32,11 @@ export const updateTenderBody = z.object({
 });
 export type UpdateTenderBody = z.infer<typeof updateTenderBody>;
 
-// Tender items (BoQ)
+// Tender items (BoQ) – description may be empty for draft saves
 export const tenderItemSchema = z.object({
   id: z.string().uuid().optional(),
   sort_order: z.number().int().min(0),
-  description: z.string().min(1),
+  description: z.string(),
   quantity: z.number().min(0),
   unit: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),

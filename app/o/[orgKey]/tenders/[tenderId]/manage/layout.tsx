@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { getTenderById } from "@/lib/tenders";
 import { getOrgByKey } from "@/lib/org";
 import { redirect } from "next/navigation";
 import { TenderHeader } from "@/components/shell/TenderHeader";
 import { ActionRequiredStrip } from "@/components/shell/ActionRequiredStrip";
+import { ManageTabs } from "@/components/shell/ManageTabs";
 
 export default async function ManageLayout({
   children,
@@ -20,47 +20,9 @@ export default async function ManageLayout({
 
   return (
     <div>
-      <TenderHeader
-        title={tender.title}
-        status={tender.status}
-        orgKey={orgKey}
-        tenderId={tenderId}
-      />
+      <TenderHeader tender={tender} orgKey={orgKey} />
       <ActionRequiredStrip orgKey={orgKey} tenderId={tenderId} />
-      <nav
-        style={{
-          display: "flex",
-          gap: "1rem",
-          marginBottom: "1rem",
-          borderBottom: "1px solid #e5e5e5",
-          paddingBottom: "0.5rem",
-        }}
-      >
-        <Link
-          href={`/o/${orgKey}/tenders/${tenderId}/manage/submissions`}
-          style={{ textDecoration: "underline" }}
-        >
-          Submissions
-        </Link>
-        <Link
-          href={`/o/${orgKey}/tenders/${tenderId}/manage/vendors`}
-          style={{ textDecoration: "underline" }}
-        >
-          Vendors
-        </Link>
-        <Link
-          href={`/o/${orgKey}/tenders/${tenderId}/manage/compare`}
-          style={{ textDecoration: "underline" }}
-        >
-          Compare
-        </Link>
-        <Link
-          href={`/o/${orgKey}/tenders/${tenderId}/manage/qa`}
-          style={{ textDecoration: "underline" }}
-        >
-          Q&A
-        </Link>
-      </nav>
+      <ManageTabs orgKey={orgKey} tenderId={tenderId} />
       {children}
     </div>
   );

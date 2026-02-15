@@ -90,6 +90,7 @@ export default function SetupStep3Page() {
   const [dragOver, setDragOver] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/o/${orgKey}/tenders/${tenderId}`);
@@ -148,30 +149,34 @@ export default function SetupStep3Page() {
   const showEmptyState = items.length === 0;
 
   async function saveDraft() {
+    setSaveError(null);
     setSaving(true);
-    await fetch(`/api/o/${orgKey}/tenders/${tenderId}/items`, {
+    const res = await fetch(`/api/o/${orgKey}/tenders/${tenderId}/items`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: items
-          .filter((i) => i.description.trim())
-          .map((i, idx) => ({
-            sort_order: idx,
-            description: i.description,
-            quantity: i.quantity,
-            unit: i.unit || null,
-            notes: i.notes || null,
-            image_url: i.image_url?.trim() || null,
-          })),
+        items: items.map((i, idx) => ({
+          sort_order: idx,
+          description: i.description.trim() || "",
+          quantity: i.quantity,
+          unit: i.unit || null,
+          notes: i.notes || null,
+          image_url: i.image_url?.trim() || null,
+        })),
       }),
     });
     setSaving(false);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      setSaveError(err?.error ?? "Failed to save items. Please try again.");
+    }
   }
 
   async function saveAndContinue(e: React.FormEvent) {
     e.preventDefault();
+    setSaveError(null);
     setSaving(true);
-    await fetch(`/api/o/${orgKey}/tenders/${tenderId}/items`, {
+    const res = await fetch(`/api/o/${orgKey}/tenders/${tenderId}/items`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -188,6 +193,11 @@ export default function SetupStep3Page() {
       }),
     });
     setSaving(false);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      setSaveError(err?.error ?? "Failed to save items. Please try again.");
+      return;
+    }
     router.push(`${base}/step-4`);
   }
 
@@ -318,7 +328,11 @@ export default function SetupStep3Page() {
           Add items vendors will price. You can attach supporting documents.
         </p>
       </div>
-
+      {saveError && (
+        <p style={{ margin: 0, marginBottom: "1rem", color: "#b91c1c", fontSize: "0.875rem" }}>
+          {saveError}
+        </p>
+      )}
       <div
         style={{
           display: "flex",
