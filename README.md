@@ -20,9 +20,13 @@ Static tender pages built with Jekyll, deployable to GitHub Pages. Procurement s
 
 ## Adding a new tender
 
-1. Create a new Markdown file under `_tenders/`, e.g. `_tenders/my-org-2026-0003.md`.
+1. Copy the template and create a new tender file:
+   ```bash
+   cp _templates/tender.md _tenders/<slug>.md
+   ```
+   Use a `slug` for the URL (e.g. `my-org-2026-0003` → `/tenders/my-org-2026-0003/`). See `_templates/README.md` for details.
 
-2. Use the front matter and structure from the [Data Model](#data-model) below. Copy from an existing tender (e.g. `_tenders/fh-2026-0001.md`) and edit.
+2. Edit `_tenders/<slug>.md`: fill in the placeholders and remove any sections you don't need. Use the [Data Model](#data-model) below for field descriptions.
 
 3. Set `published: true` when the tender is ready to appear on the homepage. Set `published: false` to hide it (the detail page remains buildable if someone has the URL).
 
@@ -34,6 +38,48 @@ Static tender pages built with Jekyll, deployable to GitHub Pages. Procurement s
 
 - **Publish:** Set `published: true` in the tender’s front matter. It will show on the homepage and in search.
 - **Unpublish:** Set `published: false`. It will not appear on the homepage or in search. The tender detail page still exists at `/tenders/<slug>/` if the file remains in `_tenders/`. To remove it entirely, delete the file or move it out of `_tenders/`.
+
+## Language switcher (English / Khmer)
+
+Use **one tender file per tender**. The tender layout is bilingual: each detail page shows an **English | ភាសាខ្មែរ** switcher at the top. Section labels (Deadline, Summary, Scope of Work, etc.) and all content can toggle between English and Khmer. The chosen language is stored in `localStorage` so it persists across visits. The list page shows each tender once; users open the tender and switch language on the detail page if needed.
+
+### Bilingual content (optional Khmer)
+
+To show **translated content** when the user selects Khmer (not just translated labels), add optional Khmer fields in the same tender file. If a Khmer value is missing, the English value is shown as fallback.
+
+| English field | Khmer option | Notes |
+|---------------|--------------|--------|
+| `title` | `title_km` | |
+| `summary` | `summary_km` | |
+| `buyer.name` | `buyer_km.name` | |
+| `deadline.note` | `deadline_km.note` | |
+| `scope` | Each item: string or `{ en: "...", km: "..." }` | Same for `eligibility_requirements`, `required_documents` |
+| `submission.rules` | Each item: string or `{ en: "...", km: "..." }` | |
+| `submission.instructions` | `submission_km.instructions` | |
+| `submission.subject_line_format` | `submission_km.subject_line_format` | |
+| `submission.physical_address` | `submission_km.physical_address` | |
+| `submission.addresses` | Each item: string or `{ en: "...", km: "..." }` | |
+| `submission.clarification_deadline` | `submission_km.clarification_deadline` | |
+| `commercial_terms.warranty` | `commercial_terms_km.warranty` | |
+| `commercial_terms.payment_terms` | `commercial_terms_km.payment_terms` | |
+| `evaluation.criteria` | Each item: string or `{ en: "...", km: "..." }` | |
+| `evaluation.scoring[].label` | `label_km` on each scoring item | |
+| `required_submissions[].label` | `label_km` on each item | Same for `note_km` |
+| `resources[].label` | `label_km` on each item | Same for `note_km` |
+| `attachments[].label` | `label_km` on each item | |
+| `contacts[].name` | `name_km` on each contact | Same for `role_km`, `location_label_km` |
+| `goods[].description` | `description_km` on each item | Same for `specification_km` |
+| `key_dates[].label` | `label_km` on each item | Same for `note_km` |
+| Body (main content) | `body_km` | Markdown string in front matter; rendered when Khmer is selected |
+
+Example (scope with bilingual items):
+
+```yaml
+scope:
+  - en: "Component A: Review CGCC's existing bond guarantee framework..."
+    km: "ផ្នែក ក៖ ពិនិត្យរូបមន្តធានាមូលបត្រ..."
+  - "Single string shows in both languages."
+```
 
 ## Vendor form link
 
@@ -68,7 +114,7 @@ Each tender is a Markdown file in `_tenders/` with at least:
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `layout` | Yes | Set to `tender`. |
+| `layout` | Yes | Set to `tender`. The page includes an EN/Khmer language switcher. |
 | `title` | Yes | Tender title. |
 | `tender_id` | Yes | Unique id (e.g. `FH-2026-0001`). Used for the vendor form query param. |
 | `published` | Yes | `true` to show on homepage, `false` to hide. |

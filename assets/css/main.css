@@ -211,6 +211,52 @@ body {
   padding-top: 0.5rem;
 }
 
+/* Language switcher: show only the active language */
+.tender-detail[data-tender-lang="en"] .tender-lang-km {
+  display: none;
+}
+.tender-detail[data-tender-lang="km"] .tender-lang-en {
+  display: none;
+}
+
+.tender-lang-switcher-wrap {
+  margin-bottom: 1rem;
+}
+.tender-lang-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.tender-lang-sep {
+  color: var(--color-border);
+  font-weight: 300;
+}
+.tender-lang-btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.tender-lang-btn:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.tender-lang-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+.tender-lang-btn.active:hover {
+  background: var(--color-primary-hover);
+  color: #fff;
+  border-color: var(--color-primary-hover);
+}
+
 .tender-header {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;

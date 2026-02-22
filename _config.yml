@@ -33,3 +33,4 @@ exclude:
   - .git
   - .github
   - vendor
+  - _templates
