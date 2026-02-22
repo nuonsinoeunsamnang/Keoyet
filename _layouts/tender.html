@@ -2,10 +2,17 @@
 layout: default
 ---
 
-<article class="tender-detail">
+<article class="tender-detail" data-tender-lang="en" id="tender-detail">
   <div class="wrap">
     <header class="tender-header">
-      <h1 class="tender-title">{{ page.title }}</h1>
+      <div class="tender-lang-switcher-wrap">
+        <span class="tender-lang-switcher" role="group" aria-label="Switch language">
+          <button type="button" class="tender-lang-btn active" data-lang="en" aria-pressed="true">English</button>
+          <span class="tender-lang-sep" aria-hidden="true">|</span>
+          <button type="button" class="tender-lang-btn" data-lang="km" aria-pressed="false">ភាសាខ្មែរ</button>
+        </span>
+      </div>
+      <h1 class="tender-title"><span class="tender-lang-en">{{ page.title }}</span><span class="tender-lang-km">{{ page.title_km | default: page.title }}</span></h1>
       {% if page.tender_ref or page.issue_date %}
       <p class="tender-meta">
         {% if page.tender_ref %}<span class="tender-ref">{{ page.tender_ref }}</span>{% endif %}
@@ -14,7 +21,7 @@ layout: default
       </p>
       {% endif %}
       {% if page.buyer.name %}
-      <p class="tender-buyer">{{ page.buyer.name }}</p>
+      <p class="tender-buyer"><span class="tender-lang-en">{{ page.buyer.name }}</span><span class="tender-lang-km">{{ page.buyer_km.name | default: page.buyer.name }}</span></p>
       {% endif %}
       {% if page.location.province or page.location.district or page.location.address_text %}
       <p class="tender-location">
@@ -25,23 +32,23 @@ layout: default
       {% endif %}
       {% if page.deadline.datetime %}
       <p class="tender-deadline">
-        <strong>Deadline:</strong>
+        <strong><span class="tender-lang-en">Deadline:</span><span class="tender-lang-km">ថ្ងៃផុតកំណត់៖</span></strong>
         <time datetime="{{ page.deadline.datetime }}">{{ page.deadline.datetime | date: "%B %d, %Y at %I:%M %p" }}</time>
         {% if page.deadline.timezone_label %} ({{ page.deadline.timezone_label }}){% endif %}
-        {% if page.deadline.note %} &ndash; {{ page.deadline.note }}{% endif %}
+        {% if page.deadline.note %} &ndash; <span class="tender-lang-en">{{ page.deadline.note }}</span><span class="tender-lang-km">{{ page.deadline_km.note | default: page.deadline.note }}</span>{% endif %}
       </p>
       {% endif %}
 
       {% if page.key_dates and page.key_dates.size > 0 %}
       <div class="tender-key-dates">
-        <strong>Key dates</strong>
+        <strong><span class="tender-lang-en">Key dates</span><span class="tender-lang-km">កាលបរិច្ឆេទសំខាន់</span></strong>
         <ul class="key-dates-list">
           {% for kd in page.key_dates %}
           <li>
-            <span class="key-date-label">{{ kd.label }}:</span>
+            <span class="key-date-label"><span class="tender-lang-en">{{ kd.label }}:</span><span class="tender-lang-km">{{ kd.label_km | default: kd.label }}:</span></span>
             <time datetime="{{ kd.datetime }}">{{ kd.datetime | date: "%B %d, %Y" }}</time>
             {% if kd.timezone_label %} ({{ kd.timezone_label }}){% endif %}
-            {% if kd.note %} &ndash; {{ kd.note }}{% endif %}
+            {% if kd.note %} &ndash; <span class="tender-lang-en">{{ kd.note }}</span><span class="tender-lang-km">{{ kd.note_km | default: kd.note }}</span>{% endif %}
           </li>
           {% endfor %}
         </ul>
@@ -56,26 +63,26 @@ layout: default
           {% assign cta_url = form_base | append: "?tender_id=" | append: page.tender_id %}
         {% endif %}
       <p class="tender-cta">
-        <a class="btn btn-primary" href="{{ cta_url }}" target="_blank" rel="noopener noreferrer">Submit Interest / Ask a Question</a>
+        <a class="btn btn-primary" href="{{ cta_url }}" target="_blank" rel="noopener noreferrer"><span class="tender-lang-en">Submit Interest / Ask a Question</span><span class="tender-lang-km">ដាក់ជាមតិ / សួរសំណួរ</span></a>
       </p>
       {% else %}
-      <p class="tender-cta-note">Vendor response form not available.</p>
+      <p class="tender-cta-note"><span class="tender-lang-en">Vendor response form not available.</span><span class="tender-lang-km">ទម្រង់ឆ្លើយតបរបស់អ្នកផ្គត់ផ្គង់មិនមាន។</span></p>
       {% endif %}
     </header>
 
     {% if page.summary %}
     <section class="tender-section">
-      <h2>Summary</h2>
-      <p>{{ page.summary }}</p>
+      <h2><span class="tender-lang-en">Summary</span><span class="tender-lang-km">សង្ខេប</span></h2>
+      <p><span class="tender-lang-en">{{ page.summary }}</span><span class="tender-lang-km">{{ page.summary_km | default: page.summary }}</span></p>
     </section>
     {% endif %}
 
     {% if page.scope and page.scope.size > 0 %}
     <section class="tender-section">
-      <h2>Scope of Work</h2>
+      <h2><span class="tender-lang-en">Scope of Work</span><span class="tender-lang-km">វិសាលភាពការងារ</span></h2>
       <ul>
         {% for item in page.scope %}
-        <li>{{ item }}</li>
+        <li><span class="tender-lang-en">{% if item.en %}{{ item.en }}{% else %}{{ item }}{% endif %}</span><span class="tender-lang-km">{% if item.km %}{{ item.km }}{% elsif item.en %}{{ item.en }}{% else %}{{ item }}{% endif %}</span></li>
         {% endfor %}
       </ul>
     </section>
@@ -83,10 +90,10 @@ layout: default
 
     {% if page.eligibility_requirements and page.eligibility_requirements.size > 0 %}
     <section class="tender-section">
-      <h2>Eligibility</h2>
+      <h2><span class="tender-lang-en">Eligibility</span><span class="tender-lang-km">លក្ខខណ្ឌគ្រប់គ្រាន់</span></h2>
       <ul>
         {% for item in page.eligibility_requirements %}
-        <li>{{ item }}</li>
+        <li><span class="tender-lang-en">{% if item.en %}{{ item.en }}{% else %}{{ item }}{% endif %}</span><span class="tender-lang-km">{% if item.km %}{{ item.km }}{% elsif item.en %}{{ item.en }}{% else %}{{ item }}{% endif %}</span></li>
         {% endfor %}
       </ul>
     </section>
@@ -94,10 +101,10 @@ layout: default
 
     {% if page.required_documents and page.required_documents.size > 0 %}
     <section class="tender-section">
-      <h2>Required Documents</h2>
+      <h2><span class="tender-lang-en">Required Documents</span><span class="tender-lang-km">ឯកសារត្រូវការ</span></h2>
       <ul>
         {% for doc in page.required_documents %}
-        <li>{{ doc }}</li>
+        <li><span class="tender-lang-en">{% if doc.en %}{{ doc.en }}{% else %}{{ doc }}{% endif %}</span><span class="tender-lang-km">{% if doc.km %}{{ doc.km }}{% elsif doc.en %}{{ doc.en }}{% else %}{{ doc }}{% endif %}</span></li>
         {% endfor %}
       </ul>
     </section>
@@ -105,32 +112,29 @@ layout: default
 
     {% if page.goods and page.goods.size > 0 %}
     <section class="tender-section tender-goods-section">
-      <h2>Goods / Items</h2>
+      <h2><span class="tender-lang-en">Goods / Items</span><span class="tender-lang-km">ផលិតផល / របស់</span></h2>
       <div class="tender-goods-table-wrap">
         <table class="tender-goods-table">
           <thead>
             <tr>
-              <th scope="col">№</th>
-              <th scope="col">Description</th>
-              <th scope="col">Specification</th>
-              <th scope="col">Unit</th>
-              <th scope="col">Qty</th>
+              <th scope="col"><span class="tender-lang-en">№</span><span class="tender-lang-km">ល.រ</span></th>
+              <th scope="col"><span class="tender-lang-en">Description</span><span class="tender-lang-km">ការពិពណ៌នា</span></th>
+              <th scope="col"><span class="tender-lang-en">Specification</span><span class="tender-lang-km">លក្ខណៈបច្ចេកទេស</span></th>
+              <th scope="col"><span class="tender-lang-en">Unit</span><span class="tender-lang-km">ឯកតា</span></th>
+              <th scope="col"><span class="tender-lang-en">Qty</span><span class="tender-lang-km">បរិមាណ</span></th>
             </tr>
           </thead>
           <tbody>
             {% for item in page.goods %}
             <tr>
               <td class="tender-goods-num">{{ forloop.index }}</td>
-              <td class="tender-goods-desc">{{ item.description }}</td>
+              <td class="tender-goods-desc"><span class="tender-lang-en">{{ item.description }}</span><span class="tender-lang-km">{{ item.description_km | default: item.description }}</span></td>
               <td class="tender-goods-spec">
-                {% if item.specification %}
-                  {% if item.specification.size %}
-                    {% for line in item.specification %}
-                      {{ line }}{% unless forloop.last %}<br>{% endunless %}
-                    {% endfor %}
-                  {% else %}
-                    {{ item.specification | newline_to_br }}
-                  {% endif %}
+                {% assign spec_en = item.specification %}
+                {% assign spec_km = item.specification_km | default: item.specification %}
+                {% if spec_en %}
+                  <span class="tender-lang-en">{% if spec_en.size %}{% for line in spec_en %}{{ line }}{% unless forloop.last %}<br>{% endunless %}{% endfor %}{% else %}{{ spec_en | newline_to_br }}{% endif %}</span>
+                  <span class="tender-lang-km">{% if spec_km.size %}{% for line in spec_km %}{{ line }}{% unless forloop.last %}<br>{% endunless %}{% endfor %}{% else %}{{ spec_km | newline_to_br }}{% endif %}</span>
                 {% endif %}
               </td>
               <td class="tender-goods-unit">{{ item.unit }}</td>
@@ -145,19 +149,19 @@ layout: default
 
     {% if page.contacts and page.contacts.size > 0 %}
     <section class="tender-section">
-      <h2>Contacts</h2>
+      <h2><span class="tender-lang-en">Contacts</span><span class="tender-lang-km">ទំនាក់ទំនង</span></h2>
       <ul class="contacts-list">
         {% for c in page.contacts %}
         <li class="contact-card">
-          {% if c.name %}<strong>{{ c.name }}</strong>{% endif %}
-          {% if c.role %}<span class="contact-role">{{ c.role }}</span>{% endif %}
+          {% if c.name %}<strong><span class="tender-lang-en">{{ c.name }}</span><span class="tender-lang-km">{{ c.name_km | default: c.name }}</span></strong>{% endif %}
+          {% if c.role %}<span class="contact-role"><span class="tender-lang-en">{{ c.role }}</span><span class="tender-lang-km">{{ c.role_km | default: c.role }}</span></span>{% endif %}
           {% if c.phone and c.phone.size > 0 %}
           <span class="contact-phone">{% for p in c.phone %}<a href="tel:{{ p | replace: ' ', '' }}">{{ p }}</a>{% unless forloop.last %}, {% endunless %}{% endfor %}</span>
           {% endif %}
           {% if c.email and c.email.size > 0 %}
           <span class="contact-email">{% for e in c.email %}<a href="mailto:{{ e }}">{{ e }}</a>{% unless forloop.last %}, {% endunless %}{% endfor %}</span>
           {% endif %}
-          {% if c.location_label %}<span class="contact-location">{{ c.location_label }}</span>{% endif %}
+          {% if c.location_label %}<span class="contact-location"><span class="tender-lang-en">{{ c.location_label }}</span><span class="tender-lang-km">{{ c.location_label_km | default: c.location_label }}</span></span>{% endif %}
           {% if c.address %}<span class="contact-address">{{ c.address }}</span>{% endif %}
         </li>
         {% endfor %}
@@ -166,42 +170,42 @@ layout: default
     {% endif %}
 
     <section class="tender-section">
-      <h2>Submission Instructions</h2>
+      <h2><span class="tender-lang-en">Submission Instructions</span><span class="tender-lang-km">ការណែនាំដាក់ជាមតិ</span></h2>
       {% if page.submission.rules and page.submission.rules.size > 0 %}
-      <p><strong>Submission rules</strong></p>
+      <p><strong><span class="tender-lang-en">Submission rules</span><span class="tender-lang-km">ច្បាប់ចម្លង</span></strong></p>
       <ul class="submission-rules">
         {% for r in page.submission.rules %}
-        <li>{{ r }}</li>
+        <li><span class="tender-lang-en">{% if r.en %}{{ r.en }}{% else %}{{ r }}{% endif %}</span><span class="tender-lang-km">{% if r.km %}{{ r.km }}{% elsif r.en %}{{ r.en }}{% else %}{{ r }}{% endif %}</span></li>
         {% endfor %}
       </ul>
       {% endif %}
       {% if page.submission.instructions %}
-      <p>{{ page.submission.instructions }}</p>
+      <p><span class="tender-lang-en">{{ page.submission.instructions }}</span><span class="tender-lang-km">{{ page.submission_km.instructions | default: page.submission.instructions }}</span></p>
       {% endif %}
       {% if page.submission.methods %}
-      <p><strong>Methods:</strong> {{ page.submission.methods | join: ", " }}</p>
+      <p><strong><span class="tender-lang-en">Methods:</span><span class="tender-lang-km">វិធី៖</span></strong> {{ page.submission.methods | join: ", " }}</p>
       {% endif %}
       {% if page.submission.subject_line_format %}
-      <p><strong>Subject line:</strong> <code class="subject-line-format">{{ page.submission.subject_line_format }}</code></p>
+      <p><strong><span class="tender-lang-en">Subject line:</span><span class="tender-lang-km">ប្រធានបទ៖</span></strong> <code class="subject-line-format"><span class="tender-lang-en">{{ page.submission.subject_line_format }}</span><span class="tender-lang-km">{{ page.submission_km.subject_line_format | default: page.submission.subject_line_format }}</span></code></p>
       {% endif %}
       {% if page.submission.email %}
-      <p><strong>Email:</strong> <a href="mailto:{{ page.submission.email }}">{{ page.submission.email }}</a></p>
+      <p><strong><span class="tender-lang-en">Email:</span><span class="tender-lang-km">អ៉ីមែល៖</span></strong> <a href="mailto:{{ page.submission.email }}">{{ page.submission.email }}</a></p>
       {% endif %}
       {% if page.submission.addresses and page.submission.addresses.size > 0 %}
-      <p><strong>Submission address(es):</strong></p>
+      <p><strong><span class="tender-lang-en">Submission address(es):</span><span class="tender-lang-km">អាសយដ្ឋានដាក់ជាមតិ៖</span></strong></p>
       <ul>
         {% for addr in page.submission.addresses %}
-        <li>{{ addr }}</li>
+        <li><span class="tender-lang-en">{% if addr.en %}{{ addr.en }}{% else %}{{ addr }}{% endif %}</span><span class="tender-lang-km">{% if addr.km %}{{ addr.km }}{% elsif addr.en %}{{ addr.en }}{% else %}{{ addr }}{% endif %}</span></li>
         {% endfor %}
       </ul>
       {% elsif page.submission.physical_address %}
-      <p><strong>Physical address:</strong> {{ page.submission.physical_address }}</p>
+      <p><strong><span class="tender-lang-en">Physical address:</span><span class="tender-lang-km">អាសយដ្ឋានរូបវន្ត៖</span></strong> <span class="tender-lang-en">{{ page.submission.physical_address }}</span><span class="tender-lang-km">{{ page.submission_km.physical_address | default: page.submission.physical_address }}</span></p>
       {% endif %}
       {% if page.submission.clarification_deadline or page.submission.clarification_emails %}
       <p class="submission-clarification">
-        {% if page.submission.clarification_deadline %}<strong>Clarification deadline:</strong> {{ page.submission.clarification_deadline }}. {% endif %}
+        {% if page.submission.clarification_deadline %}<strong><span class="tender-lang-en">Clarification deadline:</span><span class="tender-lang-km">ថ្ងៃផុតកំណត់សុំពន្យល់៖</span></strong> <span class="tender-lang-en">{{ page.submission.clarification_deadline }}</span><span class="tender-lang-km">{{ page.submission_km.clarification_deadline | default: page.submission.clarification_deadline }}</span>. {% endif %}
         {% if page.submission.clarification_emails and page.submission.clarification_emails.size > 0 %}
-        <strong>Clarification emails:</strong> {% for e in page.submission.clarification_emails %}<a href="mailto:{{ e }}">{{ e }}</a>{% unless forloop.last %}, {% endunless %}{% endfor %}
+        <strong><span class="tender-lang-en">Clarification emails:</span><span class="tender-lang-km">អ៉ីមែលសុំពន្យល់៖</span></strong> {% for e in page.submission.clarification_emails %}<a href="mailto:{{ e }}">{{ e }}</a>{% unless forloop.last %}, {% endunless %}{% endfor %}
         {% endif %}
       </p>
       {% endif %}
@@ -209,12 +213,12 @@ layout: default
 
     {% if page.commercial_terms and page.commercial_terms.bid_validity_days or page.commercial_terms.warranty or page.commercial_terms.payment_terms or page.commercial_terms.currency %}
     <section class="tender-section">
-      <h2>Commercial terms</h2>
+      <h2><span class="tender-lang-en">Commercial terms</span><span class="tender-lang-km">លក្ខខណ្ឌពាណិជ្ជកម្ម</span></h2>
       <ul class="commercial-terms-list">
-        {% if page.commercial_terms.bid_validity_days %}<li><strong>Bid validity:</strong> {{ page.commercial_terms.bid_validity_days }} days minimum after deadline</li>{% endif %}
-        {% if page.commercial_terms.warranty %}<li><strong>Warranty:</strong> {{ page.commercial_terms.warranty }}</li>{% endif %}
-        {% if page.commercial_terms.payment_terms %}<li><strong>Payment:</strong> {{ page.commercial_terms.payment_terms }}</li>{% endif %}
-        {% if page.commercial_terms.currency %}<li><strong>Currency:</strong> {{ page.commercial_terms.currency }}</li>{% endif %}
+        {% if page.commercial_terms.bid_validity_days %}<li><strong><span class="tender-lang-en">Bid validity:</span><span class="tender-lang-km">សុពលភាពជាមតិ៖</span></strong> <span class="tender-lang-en">{{ page.commercial_terms.bid_validity_days }} days minimum after deadline</span><span class="tender-lang-km">{{ page.commercial_terms.bid_validity_days }} ថ្ងៃយ៉ាងតិចបន្ទាប់ពីថ្ងៃផុតកំណត់</span></li>{% endif %}
+        {% if page.commercial_terms.warranty %}<li><strong><span class="tender-lang-en">Warranty:</span><span class="tender-lang-km">ការធានា៖</span></strong> <span class="tender-lang-en">{{ page.commercial_terms.warranty }}</span><span class="tender-lang-km">{{ page.commercial_terms_km.warranty | default: page.commercial_terms.warranty }}</span></li>{% endif %}
+        {% if page.commercial_terms.payment_terms %}<li><strong><span class="tender-lang-en">Payment:</span><span class="tender-lang-km">ការទូទាត់៖</span></strong> <span class="tender-lang-en">{{ page.commercial_terms.payment_terms }}</span><span class="tender-lang-km">{{ page.commercial_terms_km.payment_terms | default: page.commercial_terms.payment_terms }}</span></li>{% endif %}
+        {% if page.commercial_terms.currency %}<li><strong><span class="tender-lang-en">Currency:</span><span class="tender-lang-km">រូបិយប័ណ្ណ៖</span></strong> {{ page.commercial_terms.currency }}</li>{% endif %}
       </ul>
     </section>
     {% endif %}
@@ -223,24 +227,24 @@ layout: default
     {% assign eval_scoring = page.evaluation.scoring | default: "" %}
     {% if page.evaluation and eval_criteria.size > 0 or eval_scoring.size > 0 %}
     <section class="tender-section">
-      <h2>Evaluation</h2>
+      <h2><span class="tender-lang-en">Evaluation</span><span class="tender-lang-km">ការវាយតម្លៃ</span></h2>
       {% if page.evaluation.criteria and page.evaluation.criteria.size > 0 %}
-      <p><strong>Criteria</strong></p>
+      <p><strong><span class="tender-lang-en">Criteria</span><span class="tender-lang-km">ប្រការវាយតម្លៃ</span></strong></p>
       <ul>
         {% for c in page.evaluation.criteria %}
-        <li>{{ c }}</li>
+        <li><span class="tender-lang-en">{% if c.en %}{{ c.en }}{% else %}{{ c }}{% endif %}</span><span class="tender-lang-km">{% if c.km %}{{ c.km }}{% elsif c.en %}{{ c.en }}{% else %}{{ c }}{% endif %}</span></li>
         {% endfor %}
       </ul>
       {% endif %}
       {% if page.evaluation.scoring and page.evaluation.scoring.size > 0 %}
-      <p><strong>Scoring</strong></p>
+      <p><strong><span class="tender-lang-en">Scoring</span><span class="tender-lang-km">ពិន្ទុ</span></strong></p>
       <table class="evaluation-scoring-table">
         <thead>
-          <tr><th scope="col">Criterion</th><th scope="col">Weight</th></tr>
+          <tr><th scope="col"><span class="tender-lang-en">Criterion</span><span class="tender-lang-km">ប្រការ</span></th><th scope="col"><span class="tender-lang-en">Weight</span><span class="tender-lang-km">ទម្ងន់</span></th></tr>
         </thead>
         <tbody>
           {% for s in page.evaluation.scoring %}
-          <tr><td>{{ s.label }}</td><td>{{ s.weight }}</td></tr>
+          <tr><td><span class="tender-lang-en">{{ s.label }}</span><span class="tender-lang-km">{{ s.label_km | default: s.label }}</span></td><td>{{ s.weight }}</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -250,15 +254,15 @@ layout: default
 
     {% if page.required_submissions and page.required_submissions.size > 0 %}
     <section class="tender-section">
-      <h2>Required submissions</h2>
-      <p class="section-note">Forms, templates, and documents that must be completed or submitted.</p>
+      <h2><span class="tender-lang-en">Required submissions</span><span class="tender-lang-km">ការដាក់ជាមតិត្រូវការ</span></h2>
+      <p class="section-note"><span class="tender-lang-en">Forms, templates, and documents that must be completed or submitted.</span><span class="tender-lang-km">ទម្រង់ គំរូ និងឯកសារដែលត្រូវបំពេញ ឬដាក់ជាមតិ។</span></p>
       <ul class="required-submissions-list">
         {% for rs in page.required_submissions %}
         <li>
-          {% if rs.url %}<a href="{{ rs.url }}" target="_blank" rel="noopener noreferrer">{{ rs.label }}</a>{% else %}<span>{{ rs.label }}</span>{% endif %}
+          {% if rs.url %}<a href="{{ rs.url }}" target="_blank" rel="noopener noreferrer"><span class="tender-lang-en">{{ rs.label }}</span><span class="tender-lang-km">{{ rs.label_km | default: rs.label }}</span></a>{% else %}<span><span class="tender-lang-en">{{ rs.label }}</span><span class="tender-lang-km">{{ rs.label_km | default: rs.label }}</span></span>{% endif %}
           {% if rs.type %}<span class="req-type">({{ rs.type }})</span>{% endif %}
-          {% if rs.required == false %}<span class="req-optional">optional</span>{% endif %}
-          {% if rs.note %} &ndash; {{ rs.note }}{% endif %}
+          {% if rs.required == false %}<span class="req-optional"><span class="tender-lang-en">optional</span><span class="tender-lang-km">ជម្រើស</span></span>{% endif %}
+          {% if rs.note %} &ndash; <span class="tender-lang-en">{{ rs.note }}</span><span class="tender-lang-km">{{ rs.note_km | default: rs.note }}</span>{% endif %}
         </li>
         {% endfor %}
       </ul>
@@ -267,12 +271,12 @@ layout: default
 
     {% if page.resources and page.resources.size > 0 %}
     <section class="tender-section">
-      <h2>Resources</h2>
+      <h2><span class="tender-lang-en">Resources</span><span class="tender-lang-km">ធនធាន</span></h2>
       <ul class="resources-list">
         {% for r in page.resources %}
         <li>
-          <a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r.label }}</a>
-          {% if r.note %} &ndash; {{ r.note }}{% endif %}
+          <a href="{{ r.url }}" target="_blank" rel="noopener noreferrer"><span class="tender-lang-en">{{ r.label }}</span><span class="tender-lang-km">{{ r.label_km | default: r.label }}</span></a>
+          {% if r.note %} &ndash; <span class="tender-lang-en">{{ r.note }}</span><span class="tender-lang-km">{{ r.note_km | default: r.note }}</span>{% endif %}
         </li>
         {% endfor %}
       </ul>
@@ -281,29 +285,31 @@ layout: default
 
     {% if page.attachments and page.attachments.size > 0 %}
     <section class="tender-section">
-      <h2>Attachments</h2>
+      <h2><span class="tender-lang-en">Attachments</span><span class="tender-lang-km">ឯកសារភ្ជាប់</span></h2>
       <ul class="attachments-list">
         {% for att in page.attachments %}
         <li>
-          <a href="{{ att.url }}" target="_blank" rel="noopener noreferrer">{{ att.label | default: "Attachment" }}</a>
+          <a href="{{ att.url }}" target="_blank" rel="noopener noreferrer"><span class="tender-lang-en">{{ att.label | default: "Attachment" }}</span><span class="tender-lang-km">{{ att.label_km | default: att.label | default: "ឯកសារភ្ជាប់" }}</span></a>
         </li>
         {% endfor %}
       </ul>
     </section>
     {% endif %}
 
-    {% if content != "" %}
+    {% if content != "" or page.body_km %}
     <section class="tender-section tender-body">
       <div class="prose">
-        {{ content }}
+        <div class="tender-lang-en">{% if content != "" %}{{ content }}{% elsif page.body_km %}{{ page.body_km | markdownify }}{% endif %}</div>
+        <div class="tender-lang-km">{% if page.body_km %}{{ page.body_km | markdownify }}{% else %}{{ content }}{% endif %}</div>
       </div>
     </section>
     {% endif %}
 
     {% if form_base != "" %}
     <p class="tender-cta tender-cta-bottom">
-      <a class="btn btn-primary" href="{{ cta_url }}" target="_blank" rel="noopener noreferrer">Submit Interest / Ask a Question</a>
+      <a class="btn btn-primary" href="{{ cta_url }}" target="_blank" rel="noopener noreferrer"><span class="tender-lang-en">Submit Interest / Ask a Question</span><span class="tender-lang-km">ដាក់ជាមតិ / សួរសំណួរ</span></a>
     </p>
     {% endif %}
   </div>
 </article>
+<script src="{{ '/assets/js/tender-lang.js' | relative_url }}" defer></script>

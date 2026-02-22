@@ -8,3 +8,13 @@ title: "Page not found"
   <p>The page you requested could not be found.</p>
   <p><a href="{{ '/' | relative_url }}">Return to Tenders</a></p>
 </div>
+<script>
+(function() {
+  var path = window.location.pathname;
+  var m = path.match(/^\/tenders\/(.+-khmer)\/?$/);
+  if (m) {
+    var slug = m[1].replace(/-khmer$/, '');
+    window.location.replace(path.replace(/\/tenders\/.+-khmer\/?/, '/tenders/' + slug + '/'));
+  }
+})();
+</script>
