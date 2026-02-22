@@ -3,8 +3,9 @@
 
 title: "Keoyet Tenders"
 description: "Public tender notices and submission information"
-baseurl: ""
-url: "https://tenders.keoyet.com"
+# Project site at github.io/Keoyet needs baseurl for asset paths. Use "" when using custom domain at root (e.g. tenders.keoyet.com).
+baseurl: "/Keoyet"
+url: "https://nuonsinoeunsamnang.github.io"
 
 # Collections
 collections:
