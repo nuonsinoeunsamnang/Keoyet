@@ -74,18 +74,30 @@ Each tender is a Markdown file in `_tenders/` with at least:
 | `published` | Yes | `true` to show on homepage, `false` to hide. |
 | `date_posted` | Yes | `YYYY-MM-DD` for sorting (newest first). |
 | `buyer.name` | Yes | Buyer/organization name. |
+| `tender_ref` | Optional | Official reference (ITB/RFP/CFA number). Shown under title. |
+| `issue_date` | Optional | `YYYY-MM-DD` issue date. Shown under title. |
 | `deadline.datetime` | Recommended | ISO 8601 datetime for deadline. |
 | `deadline.timezone_label` | Optional | e.g. `ICT (UTC+7)`. |
-| `submission` | Recommended | `methods`, `email`, `physical_address`, `instructions`. |
+| `deadline.note` | Optional | Short note (e.g. "Late submissions not accepted"). |
+| `key_dates` | Optional | List of `{ label, datetime, timezone_label, note }` for clarification cutoff, bid opening, Q&A, award notice, etc. |
+| `contacts` | Optional | List of `{ name, role, phone[], email[], location_label, address }` (procurement, technical, local office). |
+| `submission` | Recommended | See submission block below. |
 | `summary` | Recommended | Short summary for cards. |
 | `scope` | Optional | List of scope items. |
 | `eligibility_requirements` | Optional | List. |
-| `required_documents` | Optional | List. |
+| `required_documents` | Optional | List (plain text). |
+| `required_submissions` | Optional | Checklist: list of `{ label, type, url, required, note }`. `type`: `form`, `policy_to_sign`, `template`, `certificate`, `proposal_doc`. |
+| `commercial_terms` | Optional | `bid_validity_days`, `warranty`, `payment_terms`, `currency`. |
+| `evaluation` | Optional | `criteria` (list of strings), `scoring` (list of `{ label, weight }`). |
+| `resources` | Optional | List of `{ label, url, note }` (e.g. Drive links, external docs). |
 | `attachments` | Optional | List of `label` and `url`. |
 | `vendor_form.base_url` | Optional | External form URL; `tender_id` is appended. |
 | `location` | Optional | `province`, `district`, `address_text`, etc. |
+| `goods` | Optional | List of `{ description, specification, unit, qty }` for goods/items table. |
 
-The body of the file can contain extra Markdown (longer scope, notes, etc.).
+**Submission block** can include: `methods`, `instructions`, `email`, `physical_address`; and optionally `rules` (array of strings, e.g. "sealed envelope", "no email"), `subject_line_format`, `addresses` (array for multiple offices), `clarification_deadline`, `clarification_emails`.
+
+The body of the file can contain extra Markdown (longer scope, notes, figures, etc.).
 
 ## URLs
 

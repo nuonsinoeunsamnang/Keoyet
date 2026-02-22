@@ -6,6 +6,13 @@ layout: default
   <div class="wrap">
     <header class="tender-header">
       <h1 class="tender-title">{{ page.title }}</h1>
+      {% if page.tender_ref or page.issue_date %}
+      <p class="tender-meta">
+        {% if page.tender_ref %}<span class="tender-ref">{{ page.tender_ref }}</span>{% endif %}
+        {% if page.tender_ref and page.issue_date %} &middot; {% endif %}
+        {% if page.issue_date %}<time datetime="{{ page.issue_date }}">{{ page.issue_date | date: "%B %d, %Y" }}</time>{% endif %}
+      </p>
+      {% endif %}
       {% if page.buyer.name %}
       <p class="tender-buyer">{{ page.buyer.name }}</p>
       {% endif %}
@@ -23,6 +30,22 @@ layout: default
         {% if page.deadline.timezone_label %} ({{ page.deadline.timezone_label }}){% endif %}
         {% if page.deadline.note %} &ndash; {{ page.deadline.note }}{% endif %}
       </p>
+      {% endif %}
+
+      {% if page.key_dates and page.key_dates.size > 0 %}
+      <div class="tender-key-dates">
+        <strong>Key dates</strong>
+        <ul class="key-dates-list">
+          {% for kd in page.key_dates %}
+          <li>
+            <span class="key-date-label">{{ kd.label }}:</span>
+            <time datetime="{{ kd.datetime }}">{{ kd.datetime | date: "%B %d, %Y" }}</time>
+            {% if kd.timezone_label %} ({{ kd.timezone_label }}){% endif %}
+            {% if kd.note %} &ndash; {{ kd.note }}{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
       {% endif %}
 
       {% assign form_base = page.vendor_form.base_url | default: "" | strip %}
@@ -80,21 +103,181 @@ layout: default
     </section>
     {% endif %}
 
+    {% if page.goods and page.goods.size > 0 %}
+    <section class="tender-section tender-goods-section">
+      <h2>Goods / Items</h2>
+      <div class="tender-goods-table-wrap">
+        <table class="tender-goods-table">
+          <thead>
+            <tr>
+              <th scope="col">№</th>
+              <th scope="col">Description</th>
+              <th scope="col">Specification</th>
+              <th scope="col">Unit</th>
+              <th scope="col">Qty</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in page.goods %}
+            <tr>
+              <td class="tender-goods-num">{{ forloop.index }}</td>
+              <td class="tender-goods-desc">{{ item.description }}</td>
+              <td class="tender-goods-spec">
+                {% if item.specification %}
+                  {% if item.specification.size %}
+                    {% for line in item.specification %}
+                      {{ line }}{% unless forloop.last %}<br>{% endunless %}
+                    {% endfor %}
+                  {% else %}
+                    {{ item.specification | newline_to_br }}
+                  {% endif %}
+                {% endif %}
+              </td>
+              <td class="tender-goods-unit">{{ item.unit }}</td>
+              <td class="tender-goods-qty">{{ item.qty }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if page.contacts and page.contacts.size > 0 %}
+    <section class="tender-section">
+      <h2>Contacts</h2>
+      <ul class="contacts-list">
+        {% for c in page.contacts %}
+        <li class="contact-card">
+          {% if c.name %}<strong>{{ c.name }}</strong>{% endif %}
+          {% if c.role %}<span class="contact-role">{{ c.role }}</span>{% endif %}
+          {% if c.phone and c.phone.size > 0 %}
+          <span class="contact-phone">{% for p in c.phone %}<a href="tel:{{ p | replace: ' ', '' }}">{{ p }}</a>{% unless forloop.last %}, {% endunless %}{% endfor %}</span>
+          {% endif %}
+          {% if c.email and c.email.size > 0 %}
+          <span class="contact-email">{% for e in c.email %}<a href="mailto:{{ e }}">{{ e }}</a>{% unless forloop.last %}, {% endunless %}{% endfor %}</span>
+          {% endif %}
+          {% if c.location_label %}<span class="contact-location">{{ c.location_label }}</span>{% endif %}
+          {% if c.address %}<span class="contact-address">{{ c.address }}</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
     <section class="tender-section">
       <h2>Submission Instructions</h2>
+      {% if page.submission.rules and page.submission.rules.size > 0 %}
+      <p><strong>Submission rules</strong></p>
+      <ul class="submission-rules">
+        {% for r in page.submission.rules %}
+        <li>{{ r }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
       {% if page.submission.instructions %}
       <p>{{ page.submission.instructions }}</p>
       {% endif %}
       {% if page.submission.methods %}
       <p><strong>Methods:</strong> {{ page.submission.methods | join: ", " }}</p>
       {% endif %}
+      {% if page.submission.subject_line_format %}
+      <p><strong>Subject line:</strong> <code class="subject-line-format">{{ page.submission.subject_line_format }}</code></p>
+      {% endif %}
       {% if page.submission.email %}
       <p><strong>Email:</strong> <a href="mailto:{{ page.submission.email }}">{{ page.submission.email }}</a></p>
       {% endif %}
-      {% if page.submission.physical_address %}
+      {% if page.submission.addresses and page.submission.addresses.size > 0 %}
+      <p><strong>Submission address(es):</strong></p>
+      <ul>
+        {% for addr in page.submission.addresses %}
+        <li>{{ addr }}</li>
+        {% endfor %}
+      </ul>
+      {% elsif page.submission.physical_address %}
       <p><strong>Physical address:</strong> {{ page.submission.physical_address }}</p>
       {% endif %}
+      {% if page.submission.clarification_deadline or page.submission.clarification_emails %}
+      <p class="submission-clarification">
+        {% if page.submission.clarification_deadline %}<strong>Clarification deadline:</strong> {{ page.submission.clarification_deadline }}. {% endif %}
+        {% if page.submission.clarification_emails and page.submission.clarification_emails.size > 0 %}
+        <strong>Clarification emails:</strong> {% for e in page.submission.clarification_emails %}<a href="mailto:{{ e }}">{{ e }}</a>{% unless forloop.last %}, {% endunless %}{% endfor %}
+        {% endif %}
+      </p>
+      {% endif %}
     </section>
+
+    {% if page.commercial_terms and page.commercial_terms.bid_validity_days or page.commercial_terms.warranty or page.commercial_terms.payment_terms or page.commercial_terms.currency %}
+    <section class="tender-section">
+      <h2>Commercial terms</h2>
+      <ul class="commercial-terms-list">
+        {% if page.commercial_terms.bid_validity_days %}<li><strong>Bid validity:</strong> {{ page.commercial_terms.bid_validity_days }} days minimum after deadline</li>{% endif %}
+        {% if page.commercial_terms.warranty %}<li><strong>Warranty:</strong> {{ page.commercial_terms.warranty }}</li>{% endif %}
+        {% if page.commercial_terms.payment_terms %}<li><strong>Payment:</strong> {{ page.commercial_terms.payment_terms }}</li>{% endif %}
+        {% if page.commercial_terms.currency %}<li><strong>Currency:</strong> {{ page.commercial_terms.currency }}</li>{% endif %}
+      </ul>
+    </section>
+    {% endif %}
+
+    {% assign eval_criteria = page.evaluation.criteria | default: "" %}
+    {% assign eval_scoring = page.evaluation.scoring | default: "" %}
+    {% if page.evaluation and eval_criteria.size > 0 or eval_scoring.size > 0 %}
+    <section class="tender-section">
+      <h2>Evaluation</h2>
+      {% if page.evaluation.criteria and page.evaluation.criteria.size > 0 %}
+      <p><strong>Criteria</strong></p>
+      <ul>
+        {% for c in page.evaluation.criteria %}
+        <li>{{ c }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% if page.evaluation.scoring and page.evaluation.scoring.size > 0 %}
+      <p><strong>Scoring</strong></p>
+      <table class="evaluation-scoring-table">
+        <thead>
+          <tr><th scope="col">Criterion</th><th scope="col">Weight</th></tr>
+        </thead>
+        <tbody>
+          {% for s in page.evaluation.scoring %}
+          <tr><td>{{ s.label }}</td><td>{{ s.weight }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    {% if page.required_submissions and page.required_submissions.size > 0 %}
+    <section class="tender-section">
+      <h2>Required submissions</h2>
+      <p class="section-note">Forms, templates, and documents that must be completed or submitted.</p>
+      <ul class="required-submissions-list">
+        {% for rs in page.required_submissions %}
+        <li>
+          {% if rs.url %}<a href="{{ rs.url }}" target="_blank" rel="noopener noreferrer">{{ rs.label }}</a>{% else %}<span>{{ rs.label }}</span>{% endif %}
+          {% if rs.type %}<span class="req-type">({{ rs.type }})</span>{% endif %}
+          {% if rs.required == false %}<span class="req-optional">optional</span>{% endif %}
+          {% if rs.note %} &ndash; {{ rs.note }}{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    {% if page.resources and page.resources.size > 0 %}
+    <section class="tender-section">
+      <h2>Resources</h2>
+      <ul class="resources-list">
+        {% for r in page.resources %}
+        <li>
+          <a href="{{ r.url }}" target="_blank" rel="noopener noreferrer">{{ r.label }}</a>
+          {% if r.note %} &ndash; {{ r.note }}{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
 
     {% if page.attachments and page.attachments.size > 0 %}
     <section class="tender-section">
