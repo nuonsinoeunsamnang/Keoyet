@@ -1,0 +1,34 @@
+# Keoyet Phase-0: Digital Tender Pages
+# Jekyll config for GitHub Pages
+
+title: "Keoyet Tenders"
+description: "Public tender notices and submission information"
+baseurl: ""
+url: ""
+
+# Collections
+collections:
+  tenders:
+    output: true
+    permalink: /tenders/:slug/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: tenders
+    values:
+      layout: tender
+
+# Build
+markdown: kramdown
+highlighter: rouge
+permalink: pretty
+
+# Exclude from build
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - .git
+  - .github

@@ -1,0 +1,330 @@
+/* Keoyet Phase-0: Digital Tender Pages - minimal CSS */
+
+:root {
+  --color-text: #1a1a1a;
+  --color-text-muted: #555;
+  --color-bg: #fff;
+  --color-border: #ddd;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --max-width: 720px;
+  --spacing: 1.5rem;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.5;
+}
+
+.main {
+  padding: var(--spacing) 0 3rem;
+  min-height: 60vh;
+}
+
+.wrap {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing);
+}
+
+/* Header */
+.site-header {
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing) 0;
+}
+
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing);
+}
+
+.site-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.site-title:hover {
+  color: var(--color-primary);
+}
+
+.site-nav a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.site-nav a:hover {
+  color: var(--color-primary);
+}
+
+/* Footer */
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  padding: var(--spacing) 0;
+  margin-top: 2rem;
+}
+
+.footer-copy {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* Homepage */
+.page-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+}
+
+.page-intro {
+  margin: 0 0 var(--spacing);
+  color: var(--color-text-muted);
+}
+
+.search-box-wrap {
+  margin-bottom: var(--spacing);
+}
+
+.search-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.search-input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
+}
+
+.tender-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing);
+}
+
+.tender-card {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: var(--spacing);
+  background: var(--color-bg);
+}
+
+.tender-card.hidden {
+  display: none;
+}
+
+.tender-card-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.tender-card-title a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.tender-card-title a:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.tender-card-buyer,
+.tender-card-location,
+.tender-card-deadline {
+  margin: 0.25rem 0;
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+}
+
+.tender-card-deadline strong {
+  color: var(--color-text);
+}
+
+.tender-card-actions {
+  margin: var(--spacing) 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Tender detail */
+.tender-detail .wrap {
+  padding-top: 0.5rem;
+}
+
+.tender-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tender-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.tender-buyer {
+  margin: 0.25rem 0;
+  font-size: 1.0625rem;
+  color: var(--color-text-muted);
+}
+
+.tender-location,
+.tender-deadline {
+  margin: 0.25rem 0;
+  font-size: 0.9375rem;
+}
+
+.tender-cta {
+  margin: 1.25rem 0 0;
+}
+
+.tender-cta-note {
+  margin: 1rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.tender-cta-bottom {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.tender-section {
+  margin-bottom: 1.5rem;
+}
+
+.tender-section h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.tender-section ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.tender-section li {
+  margin: 0.25rem 0;
+}
+
+.tender-section a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.tender-section a:hover {
+  text-decoration: underline;
+}
+
+.attachments-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.attachments-list li {
+  margin: 0.5rem 0;
+}
+
+.tender-body.prose {
+  max-width: 100%;
+}
+
+.tender-body.prose p {
+  margin: 0.75rem 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.search-noscript {
+  margin-top: var(--spacing);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .main {
+    padding-top: 1rem;
+  }
+
+  .tender-title {
+    font-size: 1.25rem;
+  }
+
+  .search-input {
+    max-width: none;
+  }
+}

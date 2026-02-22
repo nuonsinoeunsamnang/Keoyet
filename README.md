@@ -1,45 +1,113 @@
-# Keoyet MVP
+# Keoyet Phase-0: Digital Tender Pages
 
-Minimal Next.js (App Router) app for org-scoped tender and submission management. No auth; access is by workspace link (`orgKey` in the URL).
+Static tender pages built with Jekyll, deployable to GitHub Pages. Procurement sends tender documents; you add one Markdown file per tender; the site lists them and each tender page has a "Submit Interest / Ask a Question" button linking to an external form (Google Form or Tally) with the tender id prefilled.
 
-## Setup
+## Local development
 
-1. Copy `.env.local.example` to `.env.local` and set:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-2. Apply the Supabase schema: in the Supabase dashboard, open **SQL Editor** and run each migration in order (`001_initial_schema.sql`, then `002_*`, `003_*`, `004_*`, `005_*`). Or use Supabase CLI migrations.
-3. `npm install` and `npm run dev`.
+1. **Ruby**  
+   Ensure Ruby 3.x is installed (e.g. `ruby -v`).
 
-### Checking data in Supabase
+2. **Install dependencies**
+   ```bash
+   bundle install
+   ```
 
-- Open your [Supabase Dashboard](https://supabase.com/dashboard) and select your project (same URL as `NEXT_PUBLIC_SUPABASE_URL`).
-- Go to **Table Editor**. You should see at least: `workspaces`, `tenders`, `tender_items`, `tender_required_docs`.
-- **Workspaces:** Each row is one org. The `org_key` column is the value used in the URL (e.g. `/o/abc12-def34`). If you use "Create workspace" on the app homepage, a row is added here.
-- **Tenders:** One row per tender; `workspace_id` links to `workspaces.id`, `status` is `draft` or `published`.
-- **tender_items** and **tender_required_docs:** Filled when you complete step 3 and step 4 of the tender setup.
+3. **Serve locally**
+   ```bash
+   bundle exec jekyll serve
+   ```
+   Open [http://localhost:4000](http://localhost:4000). Changes to content and most config/layouts will hot-reload.
 
-If nothing appears after creating a tender:
+## Adding a new tender
 
-1. **URL must match a workspace.** You must use a workspace that exists. E.g. go to `/`, click "Create workspace", then use the URL you’re redirected to (e.g. `/o/xyz-abcd`) and from there open Tenders → New tender. If you type a random path like `/o/test` and no row in `workspaces` has `org_key = 'test'`, every API call returns 404 and nothing is saved.
-2. **Confirm env and project.** Ensure `.env.local` has `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for the same Supabase project you’re viewing in the dashboard.
-3. **Confirm migrations.** All tables above must exist. Re-run the migration SQL if needed.
-4. **Check the browser Network tab.** When you click "Save & Continue" or "Publish", the request to `/api/o/.../tenders/...` should return **200**. If you see **404** (workspace not found) or **500** (e.g. missing table), fix the cause above.
+1. Create a new Markdown file under `_tenders/`, e.g. `_tenders/my-org-2026-0003.md`.
 
-## Routes
+2. Use the front matter and structure from the [Data Model](#data-model) below. Copy from an existing tender (e.g. `_tenders/fh-2026-0001.md`) and edit.
 
-- `/` – Landing: create workspace or enter workspace link
-- `/o/[orgKey]` – Org dashboard (requires valid orgKey)
-- `/o/[orgKey]/tenders` – Tender list; new tender creates draft and redirects to setup step 1
-- `/o/[orgKey]/tenders/[tenderId]/setup/step-1` … `step-5` – Tender setup wizard; step 5 publishes
-- `/o/[orgKey]/tenders/[tenderId]/manage/*` – Submissions, vendors, compare, award, Q&A
-- `/t/[slug]` – Public view-only tender page (published tenders)
-- `/submit/[slug]` – Placeholder for vendor submission (later)
-- `/invalid-workspace` – Shown when orgKey is invalid (middleware or layout redirect)
+3. Set `published: true` when the tender is ready to appear on the homepage. Set `published: false` to hide it (the detail page remains buildable if someone has the URL).
 
-## API
+4. Set `vendor_form.base_url` to your Google Form or Tally form URL. The site will append `?tender_id=<tender_id>` (or `&tender_id=...` if the URL already has a query string).
 
-See the plan for the full API map. All org-scoped routes live under `/api/o/[orgKey]/...`. Workspace creation: `POST /api/workspaces`.
+5. Commit and push. The GitHub Action will build and deploy to GitHub Pages.
 
-## MVP accelerator
+## Publish / unpublish
 
-`POST /api/o/[orgKey]/tenders/[tenderId]/submissions/ingest` – Ingest a submission (vendor + items + docs) for testing without a vendor portal.
+- **Publish:** Set `published: true` in the tender’s front matter. It will show on the homepage and in search.
+- **Unpublish:** Set `published: false`. It will not appear on the homepage or in search. The tender detail page still exists at `/tenders/<slug>/` if the file remains in `_tenders/`. To remove it entirely, delete the file or move it out of `_tenders/`.
+
+## Vendor form link
+
+- In each tender’s front matter, set:
+  ```yaml
+  vendor_form:
+    base_url: "https://forms.gle/XXXX"   # or your Tally link
+  ```
+- The site adds `?tender_id=<tender_id>` (or `&tender_id=...` if the base URL already contains `?`).
+- If `vendor_form.base_url` is missing or empty, the CTA is hidden and a short note is shown: "Vendor response form not available."
+
+## Deploy (GitHub Pages)
+
+1. In the repo: **Settings → Pages**.
+2. Under "Build and deployment", set **Source** to **GitHub Actions**.
+3. Push to `main`. The workflow `.github/workflows/pages.yml` runs: it installs Ruby, runs `bundle exec jekyll build`, and deploys the `_site` artifact to GitHub Pages.
+
+No need to choose "Jekyll" as a theme or use the legacy Pages build; this workflow builds the site in CI.
+
+## Recommended Phase-0 process
+
+1. Receive tender documents from procurement.
+2. Manually extract key info (title, buyer, deadline, submission method, scope, eligibility, required docs, attachment links).
+3. Create one file in `_tenders/<slug>.md` with the YAML front matter and optional body.
+4. Set `vendor_form.base_url` to your interest/questions form and ensure the form uses the `tender_id` query param if needed.
+5. Set `published: true` and push to `main` so the site updates.
+6. Share the tender page URL with vendors; they use the CTA to open the form with the tender id prefilled.
+
+## Data model (front matter)
+
+Each tender is a Markdown file in `_tenders/` with at least:
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `layout` | Yes | Set to `tender`. |
+| `title` | Yes | Tender title. |
+| `tender_id` | Yes | Unique id (e.g. `FH-2026-0001`). Used for the vendor form query param. |
+| `published` | Yes | `true` to show on homepage, `false` to hide. |
+| `date_posted` | Yes | `YYYY-MM-DD` for sorting (newest first). |
+| `buyer.name` | Yes | Buyer/organization name. |
+| `deadline.datetime` | Recommended | ISO 8601 datetime for deadline. |
+| `deadline.timezone_label` | Optional | e.g. `ICT (UTC+7)`. |
+| `submission` | Recommended | `methods`, `email`, `physical_address`, `instructions`. |
+| `summary` | Recommended | Short summary for cards. |
+| `scope` | Optional | List of scope items. |
+| `eligibility_requirements` | Optional | List. |
+| `required_documents` | Optional | List. |
+| `attachments` | Optional | List of `label` and `url`. |
+| `vendor_form.base_url` | Optional | External form URL; `tender_id` is appended. |
+| `location` | Optional | `province`, `district`, `address_text`, etc. |
+
+The body of the file can contain extra Markdown (longer scope, notes, etc.).
+
+## URLs
+
+- Homepage: `/`
+- Tender detail: `/tenders/<slug>/` (slug = filename without `.md`)
+- 404: `/404.html`
+
+## Tech stack
+
+- Jekyll 4.x (Ruby), minimal dependencies; safe for GitHub Pages.
+- Custom CSS in `assets/css/main.css`; no heavy framework.
+- Vanilla JS in `assets/js/search.js` for client-side search (no external libs).
+- GitHub Actions: Ruby → `bundle install` → `jekyll build` → deploy to Pages.
+
+## Files
+
+- `_config.yml` – Jekyll config, `tenders` collection, permalinks.
+- `Gemfile` – Jekyll and webrick.
+- `index.html` – Homepage; lists published tenders, search box, embedded JSON for search.
+- `_layouts/default.html`, `_layouts/tender.html` – Layouts.
+- `_includes/head.html`, `header.html`, `footer.html` – Shared fragments.
+- `_tenders/*.md` – One file per tender.
+- `assets/css/main.css` – Styles.
+- `assets/js/search.js` – Client-side filter.
+- `.github/workflows/pages.yml` – Build and deploy to GitHub Pages.

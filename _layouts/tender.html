@@ -1,0 +1,126 @@
+---
+layout: default
+---
+
+<article class="tender-detail">
+  <div class="wrap">
+    <header class="tender-header">
+      <h1 class="tender-title">{{ page.title }}</h1>
+      {% if page.buyer.name %}
+      <p class="tender-buyer">{{ page.buyer.name }}</p>
+      {% endif %}
+      {% if page.location.province or page.location.district or page.location.address_text %}
+      <p class="tender-location">
+        {% if page.location.province %}{{ page.location.province }}{% endif %}
+        {% if page.location.district %} &ndash; {{ page.location.district }}{% endif %}
+        {% if page.location.address_text %} {{ page.location.address_text }}{% endif %}
+      </p>
+      {% endif %}
+      {% if page.deadline.datetime %}
+      <p class="tender-deadline">
+        <strong>Deadline:</strong>
+        <time datetime="{{ page.deadline.datetime }}">{{ page.deadline.datetime | date: "%B %d, %Y at %I:%M %p" }}</time>
+        {% if page.deadline.timezone_label %} ({{ page.deadline.timezone_label }}){% endif %}
+        {% if page.deadline.note %} &ndash; {{ page.deadline.note }}{% endif %}
+      </p>
+      {% endif %}
+
+      {% assign form_base = page.vendor_form.base_url | default: "" | strip %}
+      {% if form_base != "" %}
+        {% if form_base contains "?" %}
+          {% assign cta_url = form_base | append: "&tender_id=" | append: page.tender_id %}
+        {% else %}
+          {% assign cta_url = form_base | append: "?tender_id=" | append: page.tender_id %}
+        {% endif %}
+      <p class="tender-cta">
+        <a class="btn btn-primary" href="{{ cta_url }}" target="_blank" rel="noopener noreferrer">Submit Interest / Ask a Question</a>
+      </p>
+      {% else %}
+      <p class="tender-cta-note">Vendor response form not available.</p>
+      {% endif %}
+    </header>
+
+    {% if page.summary %}
+    <section class="tender-section">
+      <h2>Summary</h2>
+      <p>{{ page.summary }}</p>
+    </section>
+    {% endif %}
+
+    {% if page.scope and page.scope.size > 0 %}
+    <section class="tender-section">
+      <h2>Scope of Work</h2>
+      <ul>
+        {% for item in page.scope %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    {% if page.eligibility_requirements and page.eligibility_requirements.size > 0 %}
+    <section class="tender-section">
+      <h2>Eligibility</h2>
+      <ul>
+        {% for item in page.eligibility_requirements %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    {% if page.required_documents and page.required_documents.size > 0 %}
+    <section class="tender-section">
+      <h2>Required Documents</h2>
+      <ul>
+        {% for doc in page.required_documents %}
+        <li>{{ doc }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <section class="tender-section">
+      <h2>Submission Instructions</h2>
+      {% if page.submission.instructions %}
+      <p>{{ page.submission.instructions }}</p>
+      {% endif %}
+      {% if page.submission.methods %}
+      <p><strong>Methods:</strong> {{ page.submission.methods | join: ", " }}</p>
+      {% endif %}
+      {% if page.submission.email %}
+      <p><strong>Email:</strong> <a href="mailto:{{ page.submission.email }}">{{ page.submission.email }}</a></p>
+      {% endif %}
+      {% if page.submission.physical_address %}
+      <p><strong>Physical address:</strong> {{ page.submission.physical_address }}</p>
+      {% endif %}
+    </section>
+
+    {% if page.attachments and page.attachments.size > 0 %}
+    <section class="tender-section">
+      <h2>Attachments</h2>
+      <ul class="attachments-list">
+        {% for att in page.attachments %}
+        <li>
+          <a href="{{ att.url }}" target="_blank" rel="noopener noreferrer">{{ att.label | default: "Attachment" }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    {% if content != "" %}
+    <section class="tender-section tender-body">
+      <div class="prose">
+        {{ content }}
+      </div>
+    </section>
+    {% endif %}
+
+    {% if form_base != "" %}
+    <p class="tender-cta tender-cta-bottom">
+      <a class="btn btn-primary" href="{{ cta_url }}" target="_blank" rel="noopener noreferrer">Submit Interest / Ask a Question</a>
+    </p>
+    {% endif %}
+  </div>
+</article>

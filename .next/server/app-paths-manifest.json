@@ -1,0 +1,5 @@
+{
+  "/api/o/[orgKey]/tenders/[tenderId]/route": "app/api/o/[orgKey]/tenders/[tenderId]/route.js",
+  "/api/o/[orgKey]/tenders/[tenderId]/items/route": "app/api/o/[orgKey]/tenders/[tenderId]/items/route.js",
+  "/o/[orgKey]/tenders/[tenderId]/setup/step-3/page": "app/o/[orgKey]/tenders/[tenderId]/setup/step-3/page.js"
+}

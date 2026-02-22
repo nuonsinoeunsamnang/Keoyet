@@ -1,0 +1,20 @@
+{
+  "pages": {
+    "/o/[orgKey]/tenders/[tenderId]/setup/step-3/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/o/[orgKey]/tenders/[tenderId]/setup/step-3/page.js"
+    ],
+    "/o/[orgKey]/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/o/[orgKey]/layout.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
+    ]
+  }
+}
