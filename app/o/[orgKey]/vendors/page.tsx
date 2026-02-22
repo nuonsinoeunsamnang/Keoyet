@@ -6,14 +6,17 @@ import { theme } from "@/lib/theme";
 
 export default async function VendorsListPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ orgKey: string }>;
+  searchParams: Promise<{ status?: string }>;
 }) {
   const { orgKey } = await params;
+  const { status: statusFilter } = await searchParams;
   const org = await getOrgByKey(orgKey);
   if (!org) return null;
   const [vendors, tenders] = await Promise.all([
-    getVendorsByWorkspace(org.id),
+    getVendorsByWorkspace(org.id, statusFilter ? { status: statusFilter } : undefined),
     getTendersByWorkspace(org.id),
   ]);
 
@@ -23,7 +26,9 @@ export default async function VendorsListPage({
         Vendors
       </h1>
       <p style={{ marginBottom: "1.5rem", color: theme.grayMuted, fontSize: "0.9375rem" }}>
-        All vendors in this workspace
+        {statusFilter === "pending"
+          ? "Vendors pending verification"
+          : "All vendors in this workspace"}
       </p>
       {vendors.length === 0 ? (
         <p style={{ color: "var(--foreground)" }}>

@@ -96,6 +96,7 @@ type TenderItem = {
   description: string;
   quantity: number;
   unit: string | null;
+  image_url?: string | null;
 };
 
 type RequiredDoc = { id: string; name: string; sort_order: number };
@@ -116,13 +117,17 @@ export default function SetupStep5Page() {
   const [loading, setLoading] = useState(true);
   const [publishing, setPublishing] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
+  const [itemsLoadError, setItemsLoadError] = useState(false);
   const [overviewExpanded, setOverviewExpanded] = useState(false);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (bustCache = true) => {
+    setItemsLoadError(false);
+    setLoading(true);
+    const itemsUrl = `/api/o/${orgKey}/tenders/${tenderId}/items${bustCache ? `?t=${Date.now()}` : ""}`;
     const [tRes, iRes, dRes] = await Promise.all([
-      fetch(`/api/o/${orgKey}/tenders/${tenderId}`),
-      fetch(`/api/o/${orgKey}/tenders/${tenderId}/items`),
-      fetch(`/api/o/${orgKey}/tenders/${tenderId}/required-docs`),
+      fetch(`/api/o/${orgKey}/tenders/${tenderId}`, { cache: "no-store" }),
+      fetch(itemsUrl, { cache: "no-store" }),
+      fetch(`/api/o/${orgKey}/tenders/${tenderId}/required-docs`, { cache: "no-store" }),
     ]);
     if (tRes.ok) {
       const t = await tRes.json();
@@ -130,7 +135,11 @@ export default function SetupStep5Page() {
     }
     if (iRes.ok) {
       const data = await iRes.json();
-      setItems((data.items ?? []).sort((a: TenderItem, b: TenderItem) => a.sort_order - b.sort_order));
+      const list = Array.isArray(data.items) ? data.items : [];
+      setItems(list.sort((a: TenderItem, b: TenderItem) => (a.sort_order ?? 0) - (b.sort_order ?? 0)));
+    } else {
+      setItems([]);
+      setItemsLoadError(true);
     }
     if (dRes.ok) {
       const data = await dRes.json();
@@ -215,7 +224,7 @@ export default function SetupStep5Page() {
           Dashboard
         </Link>
         <span style={{ margin: "0 0.375rem" }}>/</span>
-        <span style={{ color: "var(--foreground)" }}>Create Tender</span>
+        <span style={{ color: "var(--dashboard-fg, #0a0a0a)" }}>Create Tender</span>
       </nav>
 
       <div
@@ -296,7 +305,7 @@ export default function SetupStep5Page() {
         </p>
       )}
 
-      {/* Tender pill + ref + status */}
+      {/* Tender pill + ref pill + status */}
       <div
         style={{
           display: "inline-flex",
@@ -319,19 +328,20 @@ export default function SetupStep5Page() {
         >
           {tender.title || "Untitled Tender"}
         </span>
-        <span style={{ fontSize: "0.9375rem", color: theme.grayMuted }}>
-          {tender.reference_id || "—"}
-        </span>
         <span
           style={{
             padding: "0.25rem 0.5rem",
-            borderRadius: 9999,
-            fontSize: "0.75rem",
-            fontWeight: 500,
+            borderRadius: 8,
             background: theme.grayBadgeBg,
+            border: `1px solid ${theme.grayBorder}`,
+            fontSize: "0.9375rem",
+            fontWeight: 500,
             color: theme.grayBadgeText,
           }}
         >
+          {tender.reference_id || "—"}
+        </span>
+        <span style={{ fontSize: "0.9375rem", color: theme.grayMuted }}>
           {tender.status === "published" ? "Published" : "Draft"}
         </span>
       </div>
@@ -376,7 +386,7 @@ export default function SetupStep5Page() {
               >
                 {isComplete ? "✓" : s.num}
               </span>
-              <span>{s.label}</span>
+              <span>{isCurrent ? `${s.num} ${s.label}` : s.label}</span>
               {s.num < 5 && (
                 <span
                   style={{
@@ -402,9 +412,17 @@ export default function SetupStep5Page() {
           boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
         }}
       >
-        <h2 style={{ margin: 0, marginBottom: "1rem", fontSize: "1rem", fontWeight: 600, color: "#0a0a0a" }}>
-          Tender Overview
-        </h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap", gap: "0.5rem" }}>
+          <h2 style={{ margin: 0, fontSize: "1rem", fontWeight: 600, color: "#0a0a0a" }}>
+            Tender Overview
+          </h2>
+          <Link
+            href={`${base}/step-1`}
+            style={{ fontSize: "0.875rem", color: theme.blue, textDecoration: "none", fontWeight: 500 }}
+          >
+            Edit
+          </Link>
+        </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", fontSize: "0.9375rem" }}>
           <div>
             <span style={{ color: theme.grayMuted, display: "block", fontSize: "0.8125rem" }}>Tender Title</span>
@@ -461,9 +479,17 @@ export default function SetupStep5Page() {
           boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
         }}
       >
-        <h2 style={{ margin: 0, marginBottom: "1rem", fontSize: "1rem", fontWeight: 600, color: "#0a0a0a" }}>
-          Timeline
-        </h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap", gap: "0.5rem" }}>
+          <h2 style={{ margin: 0, fontSize: "1rem", fontWeight: 600, color: "#0a0a0a" }}>
+            Timeline
+          </h2>
+          <Link
+            href={`${base}/step-2`}
+            style={{ fontSize: "0.875rem", color: theme.blue, textDecoration: "none", fontWeight: 500 }}
+          >
+            Edit
+          </Link>
+        </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", fontSize: "0.9375rem" }}>
           <div>
             <span style={{ color: theme.grayMuted, display: "block", fontSize: "0.8125rem" }}>Publish Date</span>
@@ -498,20 +524,20 @@ export default function SetupStep5Page() {
             {tender.accept_online_submissions ? (
               <span style={{ color: theme.green }}><CheckIcon /></span>
             ) : (
-              <span style={{ color: theme.grayMuted }}><XIcon /></span>
+              <span style={{ color: theme.redText }}><XIcon /></span>
             )}
             <span>
-              Online submissions {tender.accept_online_submissions ? "enabled" : "disabled"}
+              {tender.accept_online_submissions ? "Online submissions enabled" : "Online submissions disabled"}
             </span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             {tender.accept_physical_submissions ? (
               <span style={{ color: theme.green }}><CheckIcon /></span>
             ) : (
-              <span style={{ color: theme.grayMuted }}><XIcon /></span>
+              <span style={{ color: theme.redText }}><XIcon /></span>
             )}
             <span>
-              Physical submissions {tender.accept_physical_submissions ? "enabled" : "disabled"}
+              {tender.accept_physical_submissions ? "Physical submissions enabled" : "Physical submissions disabled"}
             </span>
           </div>
         </div>
@@ -531,12 +557,30 @@ export default function SetupStep5Page() {
           <h2 style={{ margin: 0, fontSize: "1rem", fontWeight: 600, color: "#0a0a0a" }}>
             {items.length} items
           </h2>
-          <Link
-            href={`${base}/step-3`}
-            style={{ fontSize: "0.875rem", color: theme.blue, textDecoration: "none", fontWeight: 500 }}
-          >
-            Edit items
-          </Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <button
+              type="button"
+              onClick={() => load(true)}
+              style={{
+                fontSize: "0.875rem",
+                color: theme.blue,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                fontWeight: 500,
+                textDecoration: "underline",
+              }}
+            >
+              Refresh
+            </button>
+            <Link
+              href={`${base}/step-3`}
+              style={{ fontSize: "0.875rem", color: theme.blue, textDecoration: "none", fontWeight: 500 }}
+            >
+              Edit items
+            </Link>
+          </div>
         </div>
         {items.length > 0 ? (
           <>
@@ -545,6 +589,9 @@ export default function SetupStep5Page() {
                 <tr>
                   <th style={{ textAlign: "left", padding: "0.5rem 0.75rem", borderBottom: `1px solid ${theme.grayInputBorder}`, fontWeight: 600, color: "#374151" }}>
                     Item No.
+                  </th>
+                  <th style={{ textAlign: "left", padding: "0.5rem 0.75rem", borderBottom: `1px solid ${theme.grayInputBorder}`, fontWeight: 600, color: "#374151" }}>
+                    Image
                   </th>
                   <th style={{ textAlign: "left", padding: "0.5rem 0.75rem", borderBottom: `1px solid ${theme.grayInputBorder}`, fontWeight: 600, color: "#374151" }}>
                     Description
@@ -561,6 +608,18 @@ export default function SetupStep5Page() {
                 {previewItems.map((item, i) => (
                   <tr key={item.id}>
                     <td style={{ padding: "0.5rem 0.75rem", borderBottom: `1px solid ${theme.grayBorder}` }}>{i + 1}</td>
+                    <td style={{ padding: "0.5rem 0.75rem", borderBottom: `1px solid ${theme.grayBorder}`, verticalAlign: "middle" }}>
+                      {item.image_url ? (
+                        <img
+                          src={item.image_url}
+                          alt=""
+                          style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 4, display: "block" }}
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <span style={{ color: theme.grayMuted, fontSize: "0.8125rem" }}>—</span>
+                      )}
+                    </td>
                     <td style={{ padding: "0.5rem 0.75rem", borderBottom: `1px solid ${theme.grayBorder}` }}>{item.description}</td>
                     <td style={{ padding: "0.5rem 0.75rem", borderBottom: `1px solid ${theme.grayBorder}` }}>{item.unit || "—"}</td>
                     <td style={{ padding: "0.5rem 0.75rem", borderBottom: `1px solid ${theme.grayBorder}` }}>{item.quantity}</td>
@@ -575,7 +634,18 @@ export default function SetupStep5Page() {
             )}
           </>
         ) : (
-          <p style={{ margin: 0, fontSize: "0.9375rem", color: theme.grayMuted }}>No items added.</p>
+          <>
+            {itemsLoadError ? (
+              <p style={{ margin: 0, fontSize: "0.9375rem", color: "#b91c1c" }}>
+                Couldn&apos;t load items. Check you&apos;re in the correct organisation and try <strong>Refresh</strong>.
+              </p>
+            ) : (
+              <p style={{ margin: 0, fontSize: "0.9375rem", color: theme.grayMuted }}>No items added.</p>
+            )}
+            <p style={{ margin: "0.5rem 0 0", fontSize: "0.8125rem", color: theme.grayMuted }}>
+              Items are shown for <strong>this tender only</strong> (URL tender id: <code style={{ fontSize: "0.75rem" }}>{tenderId}</code>). Add items on Step 3 and save, then click <strong>Refresh</strong> here. For the public tender page, the tender must be <strong>Published</strong>.
+            </p>
+          </>
         )}
       </Card>
 
@@ -589,9 +659,17 @@ export default function SetupStep5Page() {
           boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
         }}
       >
-        <h2 style={{ margin: 0, marginBottom: "1rem", fontSize: "1rem", fontWeight: 600, color: "#0a0a0a" }}>
-          Documents & Compliance
-        </h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap", gap: "0.5rem" }}>
+          <h2 style={{ margin: 0, fontSize: "1rem", fontWeight: 600, color: "#0a0a0a" }}>
+            Documents & Compliance
+          </h2>
+          <Link
+            href={`${base}/step-4`}
+            style={{ fontSize: "0.875rem", color: theme.blue, textDecoration: "none", fontWeight: 500 }}
+          >
+            Edit
+          </Link>
+        </div>
         <div style={{ marginBottom: "1rem" }}>
           <span style={{ color: theme.grayMuted, fontSize: "0.8125rem", display: "block", marginBottom: "0.5rem" }}>
             Required Documents ({requiredDocs.length})
@@ -614,7 +692,7 @@ export default function SetupStep5Page() {
             Rejection Criteria
           </span>
           {activeRejectionKeys.length > 0 ? (
-            <ul style={{ margin: 0, paddingLeft: "1.25rem", fontSize: "0.9375rem" }}>
+            <ul style={{ margin: 0, paddingLeft: 0, listStyle: "none", fontSize: "0.9375rem" }}>
               {activeRejectionKeys.map((key) => (
                 <li key={key} style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
                   <span style={{ color: theme.redText }}><XIcon /></span>

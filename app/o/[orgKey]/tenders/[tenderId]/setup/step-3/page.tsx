@@ -91,14 +91,19 @@ export default function SetupStep3Page() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const loadIdRef = useRef(0);
+  const itemsRef = useRef<ItemRow[]>([]);
+  itemsRef.current = items;
 
   const load = useCallback(async () => {
-    const res = await fetch(`/api/o/${orgKey}/tenders/${tenderId}`);
+    const loadId = ++loadIdRef.current;
+    const res = await fetch(`/api/o/${orgKey}/tenders/${tenderId}`, { cache: "no-store" });
     if (!res.ok) return;
     const t = await res.json();
     setTenderTitle(t.title ?? "");
     setReferenceId(t.reference_id ?? "");
-    const itemsRes = await fetch(`/api/o/${orgKey}/tenders/${tenderId}/items`);
+    const itemsRes = await fetch(`/api/o/${orgKey}/tenders/${tenderId}/items`, { cache: "no-store" });
     let list: ItemRow[] = [];
     if (itemsRes.ok) {
       const data = await itemsRes.json();
@@ -112,7 +117,7 @@ export default function SetupStep3Page() {
           image_url?: string | null;
         }) => ({
           sort_order: i.sort_order,
-          description: i.description,
+          description: i.description ?? "",
           quantity: i.quantity ?? 1,
           unit: i.unit ?? "",
           notes: i.notes ?? "",
@@ -120,7 +125,13 @@ export default function SetupStep3Page() {
         })
       );
     }
-    setItems(list);
+    if (loadId === loadIdRef.current) {
+      const currentItems = itemsRef.current;
+      const dontOverwriteUserRows = currentItems.length > 0 && list.length === 0;
+      if (!dontOverwriteUserRows) {
+        setItems(list);
+      }
+    }
     setLoading(false);
   }, [orgKey, tenderId]);
 
@@ -148,56 +159,93 @@ export default function SetupStep3Page() {
 
   const showEmptyState = items.length === 0;
 
+  function buildItemsPayload(list: ItemRow[]) {
+    return list.map((i, idx) => ({
+      sort_order: idx,
+      description: i.description.trim() || "",
+      quantity: Number(i.quantity) >= 0 ? Number(i.quantity) : 0,
+      unit: i.unit?.trim() || null,
+      notes: i.notes?.trim() || null,
+      image_url: (() => {
+        const u = i.image_url?.trim();
+        if (!u) return null;
+        try {
+          const url = new URL(u);
+          return url.protocol === "http:" || url.protocol === "https:" ? u : null;
+        } catch {
+          return null;
+        }
+      })(),
+    }));
+  }
+
   async function saveDraft() {
     setSaveError(null);
     setSaving(true);
+    const payload = buildItemsPayload(items);
     const res = await fetch(`/api/o/${orgKey}/tenders/${tenderId}/items`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        items: items.map((i, idx) => ({
-          sort_order: idx,
-          description: i.description.trim() || "",
-          quantity: i.quantity,
-          unit: i.unit || null,
-          notes: i.notes || null,
-          image_url: i.image_url?.trim() || null,
-        })),
-      }),
+      body: JSON.stringify({ items: payload }),
     });
+    const data = await res.json().catch(() => ({}));
     setSaving(false);
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      setSaveError(err?.error ?? "Failed to save items. Please try again.");
+      const msg = data?.error ?? "Failed to save items. Please try again.";
+      const fieldErrs = data?.details?.fieldErrors
+        ? Object.entries(data.details.fieldErrors).flatMap(([k, v]) => (v as string[]).map((e) => `${k}: ${e}`)).join(". ")
+        : "";
+      const serverDetail = typeof data?.details === "string" ? data.details : "";
+      setSaveError([msg, fieldErrs, serverDetail].filter(Boolean).join(" "));
+    } else {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+      if (Array.isArray(data.items)) {
+        setItems(
+          data.items.map(
+            (i: { sort_order: number; description: string; quantity: number; unit?: string; notes?: string; image_url?: string }) => ({
+              sort_order: i.sort_order,
+              description: i.description ?? "",
+              quantity: i.quantity ?? 1,
+              unit: i.unit ?? "",
+              notes: i.notes ?? "",
+              image_url: i.image_url ?? "",
+            })
+          )
+        );
+      } else {
+        load();
+      }
     }
   }
 
   async function saveAndContinue(e: React.FormEvent) {
     e.preventDefault();
     setSaveError(null);
+    const toSave = items.filter((i) => i.description.trim());
+    if (toSave.length === 0) {
+      setSaveError("Add at least one item with a description before continuing.");
+      return;
+    }
     setSaving(true);
     const res = await fetch(`/api/o/${orgKey}/tenders/${tenderId}/items`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        items: items
-          .filter((i) => i.description.trim())
-          .map((i, idx) => ({
-            sort_order: idx,
-            description: i.description,
-            quantity: i.quantity,
-            unit: i.unit || null,
-            notes: i.notes || null,
-            image_url: i.image_url?.trim() || null,
-          })),
-      }),
+      body: JSON.stringify({ items: buildItemsPayload(toSave) }),
     });
+    const data = await res.json().catch(() => ({}));
     setSaving(false);
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      setSaveError(err?.error ?? "Failed to save items. Please try again.");
+      const msg = data?.error ?? "Failed to save items. Please try again.";
+      const fieldErrs = data?.details?.fieldErrors
+        ? Object.entries(data.details.fieldErrors).flatMap(([k, v]) => (v as string[]).map((e) => `${k}: ${e}`)).join(". ")
+        : "";
+      const serverDetail = typeof data?.details === "string" ? data.details : "";
+      setSaveError([msg, fieldErrs, serverDetail].filter(Boolean).join(" "));
       return;
     }
+    setSaveSuccess(true);
+    await load();
     router.push(`${base}/step-4`);
   }
 
@@ -304,7 +352,7 @@ export default function SetupStep3Page() {
           Dashboard
         </Link>
         <span style={{ margin: "0 0.375rem" }}>/</span>
-        <span style={{ color: "var(--foreground)" }}>Create Tender</span>
+        <span style={{ color: "var(--dashboard-fg, #0a0a0a)" }}>Create Tender</span>
       </nav>
 
       <div style={{ marginBottom: "1.5rem" }}>
@@ -331,6 +379,11 @@ export default function SetupStep3Page() {
       {saveError && (
         <p style={{ margin: 0, marginBottom: "1rem", color: "#b91c1c", fontSize: "0.875rem" }}>
           {saveError}
+        </p>
+      )}
+      {saveSuccess && (
+        <p style={{ margin: 0, marginBottom: "1rem", color: "#15803d", fontSize: "0.875rem", fontWeight: 500 }}>
+          Items saved. They will appear on the Review page and on the public tender page.
         </p>
       )}
       <div
@@ -605,7 +658,7 @@ export default function SetupStep3Page() {
                 color: theme.blueText,
               }}
             >
-              These items will appear in the vendor pricing form and in the price comparison view.
+              These items will appear in the vendor pricing form and in the price comparison view. Click <strong>Save Draft</strong> or <strong>Save & Continue</strong> to save your items so they show on the Review and public tender pages.
             </p>
           </div>
         </Card>

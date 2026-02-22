@@ -135,7 +135,7 @@ export async function getTenderItems(tenderId: string): Promise<TenderItem[]> {
   const supabase = getSupabase();
   const { data, error } = await supabase
     .from("tender_items")
-    .select("*")
+    .select("id, tender_id, sort_order, description, quantity, unit, notes, image_url, created_at")
     .eq("tender_id", tenderId)
     .order("sort_order");
   if (error) throw error;
@@ -154,20 +154,29 @@ export async function replaceTenderItems(
   }>
 ): Promise<void> {
   const supabase = getSupabase();
-  await supabase.from("tender_items").delete().eq("tender_id", tenderId);
+  const { error: deleteError } = await supabase
+    .from("tender_items")
+    .delete()
+    .eq("tender_id", tenderId);
+  if (deleteError) {
+    console.error("replaceTenderItems delete", deleteError);
+    throw new Error(deleteError.message);
+  }
   if (items.length === 0) return;
-  const { error } = await supabase.from("tender_items").insert(
-    items.map((item, i) => ({
-      tender_id: tenderId,
-      sort_order: item.sort_order ?? i,
-      description: item.description,
-      quantity: item.quantity ?? 1,
-      unit: item.unit ?? null,
-      notes: item.notes ?? null,
-      image_url: item.image_url ?? null,
-    }))
-  );
-  if (error) throw error;
+  const rows = items.map((item, i) => ({
+    tender_id: tenderId,
+    sort_order: item.sort_order ?? i,
+    description: item.description ?? "",
+    quantity: Number(item.quantity) >= 0 ? Number(item.quantity) : 1,
+    unit: item.unit ?? null,
+    notes: item.notes ?? null,
+    image_url: item.image_url ?? null,
+  }));
+  const { error: insertError } = await supabase.from("tender_items").insert(rows);
+  if (insertError) {
+    console.error("replaceTenderItems insert", insertError);
+    throw new Error(insertError.message);
+  }
 }
 
 export async function getTenderRequiredDocs(

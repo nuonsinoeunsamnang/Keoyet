@@ -7,6 +7,20 @@ export type Org = {
 };
 
 /**
+ * Get workspace by id (for public pages that only have workspace_id, e.g. from tender).
+ */
+export async function getWorkspaceById(id: string): Promise<{ name: string | null } | null> {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from("workspaces")
+    .select("name")
+    .eq("id", id)
+    .single();
+  if (error || !data) return null;
+  return { name: data.name ?? null };
+}
+
+/**
  * Resolve org by orgKey. Returns null if not found.
  */
 export async function getOrgByKey(orgKey: string): Promise<Org | null> {

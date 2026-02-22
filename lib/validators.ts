@@ -33,18 +33,32 @@ export const updateTenderBody = z.object({
 export type UpdateTenderBody = z.infer<typeof updateTenderBody>;
 
 // Tender items (BoQ) – description may be empty for draft saves
+function isValidUrl(s: string): boolean {
+  if (!s || typeof s !== "string") return false;
+  const trimmed = s.trim();
+  if (!trimmed) return false;
+  try {
+    const u = new URL(trimmed);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 export const tenderItemSchema = z.object({
   id: z.string().uuid().optional(),
   sort_order: z.number().int().min(0),
   description: z.string(),
-  quantity: z.number().min(0),
+  quantity: z.coerce.number().min(0),
   unit: z.string().optional().nullable(),
   notes: z.string().optional().nullable(),
   image_url: z
-    .union([z.string().url(), z.literal("")])
-    .optional()
-    .nullable()
-    .transform((v) => (v === "" ? null : v)),
+    .union([z.string(), z.null(), z.undefined()])
+    .transform((v) => {
+      if (v == null || typeof v !== "string") return null;
+      const trimmed = v.trim();
+      if (trimmed === "") return null;
+      return isValidUrl(trimmed) ? trimmed : null;
+    }),
 });
 export const putTenderItemsBody = z.object({
   items: z.array(tenderItemSchema),

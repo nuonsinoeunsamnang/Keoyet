@@ -1,8 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { theme } from "@/lib/theme";
+import { CopySubmissionLinkButton } from "@/components/shell/CopySubmissionLinkButton";
+import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import { MessageModal } from "@/components/modals/MessageModal";
 import type { TenderWithMeta } from "@/lib/dashboard";
 import type { TenderDisplayStatus } from "@/lib/dashboard";
 
@@ -107,17 +111,64 @@ export function TenderListTable({
   tenders: TenderWithMeta[];
   orgKey: string;
 }) {
+  const router = useRouter();
   const [statusFilter, setStatusFilter] = useState<TenderDisplayStatus | "all">(
     "all"
   );
+  const [openMenuTenderId, setOpenMenuTenderId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (openMenuTenderId === null) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuTenderId(null);
+      }
+    }
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [openMenuTenderId]);
+
+  function openDeleteConfirm(t: TenderWithMeta) {
+    if (t.submissionCount > 0) return;
+    setOpenMenuTenderId(null);
+    setConfirmDeleteId(t.id);
+  }
+
+  async function confirmDelete() {
+    if (!confirmDeleteId) return;
+    setDeletingId(confirmDeleteId);
+    try {
+      const res = await fetch(`/api/o/${orgKey}/tenders/${confirmDeleteId}`, {
+        method: "DELETE",
+      });
+      if (res.status === 204) {
+        setConfirmDeleteId(null);
+        router.refresh();
+        return;
+      }
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      setConfirmDeleteId(null);
+      setErrorMessage(data.error ?? "Failed to delete draft.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   const filtered = useMemo(() => {
     if (statusFilter === "all") return tenders;
     return tenders.filter((t) => t.displayStatus === statusFilter);
   }, [tenders, statusFilter]);
 
-  const manageHref = (t: TenderWithMeta) =>
-    `/o/${orgKey}/tenders/${t.id}/manage`;
+  const openHref = (t: TenderWithMeta) =>
+    t.displayStatus === "draft"
+      ? `/o/${orgKey}/tenders/${t.id}/setup/step-1`
+      : `/o/${orgKey}/tenders/${t.id}/manage/submissions`;
+  const showCopyLink = (t: TenderWithMeta) =>
+    t.displayStatus === "published" && t.accept_online_submissions === true;
 
   const tableHeaderStyle: React.CSSProperties = {
     textAlign: "left",
@@ -273,16 +324,127 @@ export function TenderListTable({
                     )}
                   </td>
                   <td style={{ padding: "0.75rem 1rem" }}>
-                    <Link
-                      href={manageHref(t)}
+                    <div
                       style={{
-                        color: theme.blue,
-                        textDecoration: "none",
-                        fontWeight: 500,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.75rem",
                       }}
                     >
-                      Open
-                    </Link>
+                      {t.displayStatus === "draft" ? (
+                        <div
+                          ref={openMenuTenderId === t.id ? menuRef : undefined}
+                          style={{ position: "relative" }}
+                        >
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMenuTenderId((id) =>
+                                id === t.id ? null : t.id
+                              );
+                            }}
+                            aria-expanded={openMenuTenderId === t.id}
+                            aria-haspopup="true"
+                            style={{
+                              padding: "0.25rem",
+                              border: "none",
+                              background: "transparent",
+                              color: secondaryText,
+                              cursor: "pointer",
+                              fontSize: "1.25rem",
+                              lineHeight: 1,
+                            }}
+                          >
+                            ⋯
+                          </button>
+                          {openMenuTenderId === t.id && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: "100%",
+                                left: 0,
+                                marginTop: "0.25rem",
+                                minWidth: "11rem",
+                                background: theme.white,
+                                border: `1px solid ${theme.grayBorder}`,
+                                borderRadius: 6,
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                zIndex: 10,
+                                padding: "0.25rem 0",
+                              }}
+                            >
+                              <Link
+                                href={`/o/${orgKey}/tenders/${t.id}/setup/step-1`}
+                                style={{
+                                  display: "block",
+                                  padding: "0.5rem 0.75rem",
+                                  color: primaryText,
+                                  textDecoration: "none",
+                                  fontSize: "0.875rem",
+                                }}
+                                onClick={() => setOpenMenuTenderId(null)}
+                              >
+                                Continue setup
+                              </Link>
+                              {t.submissionCount > 0 ? (
+                                <div
+                                  style={{
+                                    padding: "0.5rem 0.75rem",
+                                    fontSize: "0.8125rem",
+                                    color: secondaryText,
+                                    borderTop: `1px solid ${theme.grayBorder}`,
+                                  }}
+                                  title="Cannot delete — submissions already received."
+                                >
+                                  Cannot delete — submissions already received.
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  disabled={deletingId === t.id}
+                                  onClick={() => openDeleteConfirm(t)}
+                                  style={{
+                                    display: "block",
+                                    width: "100%",
+                                    padding: "0.5rem 0.75rem",
+                                    border: "none",
+                                    background: "transparent",
+                                    color: "#b91c1c",
+                                    fontSize: "0.875rem",
+                                    textAlign: "left",
+                                    cursor:
+                                      deletingId === t.id
+                                        ? "wait"
+                                        : "pointer",
+                                  }}
+                                >
+                                  {deletingId === t.id
+                                    ? "Deleting…"
+                                    : "Delete draft"}
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <>
+                          <Link
+                            href={openHref(t)}
+                            style={{
+                              color: theme.blue,
+                              textDecoration: "none",
+                              fontWeight: 500,
+                            }}
+                          >
+                            Open
+                          </Link>
+                          {showCopyLink(t) && (
+                            <CopySubmissionLinkButton slug={t.slug} />
+                          )}
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))
@@ -290,6 +452,25 @@ export function TenderListTable({
           </tbody>
         </table>
       </div>
+
+      <ConfirmModal
+        open={confirmDeleteId !== null}
+        onClose={() => setConfirmDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete draft?"
+        message="This can't be undone."
+        confirmLabel="Delete draft"
+        cancelLabel="Cancel"
+        loading={deletingId !== null}
+        variant="danger"
+      />
+
+      <MessageModal
+        open={errorMessage !== null}
+        onClose={() => setErrorMessage(null)}
+        title="Could not delete"
+        message={errorMessage ?? ""}
+      />
     </div>
   );
 }

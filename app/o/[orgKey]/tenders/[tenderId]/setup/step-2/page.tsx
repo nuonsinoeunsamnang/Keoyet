@@ -216,7 +216,7 @@ export default function SetupStep2Page() {
           Dashboard
         </Link>
         <span style={{ margin: "0 0.375rem" }}>/</span>
-        <span style={{ color: "var(--foreground)" }}>Create Tender</span>
+        <span style={{ color: "var(--dashboard-fg, #0a0a0a)" }}>Create Tender</span>
       </nav>
 
       <div

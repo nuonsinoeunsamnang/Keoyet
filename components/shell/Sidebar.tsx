@@ -27,15 +27,6 @@ function DashboardIcon({ active }: { active: boolean }) {
   );
 }
 
-function TendersIcon({ active }: { active: boolean }) {
-  const color = active ? theme.white : theme.grayMuted;
-  return (
-    <svg style={iconStyle} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-    </svg>
-  );
-}
-
 function VendorsIcon({ active }: { active: boolean }) {
   const color = active ? theme.white : theme.grayMuted;
   return (
@@ -56,7 +47,6 @@ export function Sidebar({
   const pathname = usePathname();
   const base = `/o/${orgKey}`;
   const isDashboard = pathname === base || pathname === `${base}/`;
-  const isTenders = pathname?.startsWith(`${base}/tenders`);
   const isVendors = pathname?.startsWith(`${base}/vendors`);
 
   return (
@@ -85,16 +75,6 @@ export function Sidebar({
         >
           <DashboardIcon active={isDashboard} />
           Dashboard
-        </Link>
-        <Link
-          href={`${base}/tenders`}
-          style={{
-            ...navItemStyle,
-            ...(isTenders && !isVendors ? { background: theme.blue, color: theme.white, fontWeight: 600 } : { color: "#374151" }),
-          }}
-        >
-          <TendersIcon active={isTenders && !isVendors} />
-          My Tenders
         </Link>
         <Link
           href={`${base}/vendors`}

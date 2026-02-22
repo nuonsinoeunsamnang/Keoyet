@@ -5,6 +5,10 @@ export type WorkQueueCounts = {
   vendorsPending: number;
   questionsPending: number;
   submissionsToReview: number;
+  /** First tender that has submissions in submitted/under_review (for "Review submissions" link) */
+  firstTenderIdWithSubmissionsToReview: string | null;
+  /** First tender with pending questions (for "Answer questions" link); not yet implemented */
+  firstTenderIdWithPendingQuestions: string | null;
 };
 
 export type TenderDisplayStatus =
@@ -20,6 +24,8 @@ export type TenderWithMeta = Tender & {
   nextDeadlineDate: string | null;
   pendingWork: number;
   tenderNumber: string;
+  /** Total submissions (any status); used to disable delete when > 0 */
+  submissionCount: number;
 };
 
 /**
@@ -44,19 +50,32 @@ export async function getDashboardWorkQueueCounts(
 
   const tenderIds = (tendersRes.data ?? []).map((t) => t.id);
   let submissionsToReview = 0;
+  let firstTenderIdWithSubmissionsToReview: string | null = null;
   if (tenderIds.length > 0) {
-    const { count } = await supabase
-      .from("submissions")
-      .select("id", { count: "exact", head: true })
-      .in("tender_id", tenderIds)
-      .in("status", ["submitted", "under_review"]);
-    submissionsToReview = count ?? 0;
+    const [countRes, oneRes] = await Promise.all([
+      supabase
+        .from("submissions")
+        .select("id", { count: "exact", head: true })
+        .in("tender_id", tenderIds)
+        .in("status", ["submitted", "under_review"]),
+      supabase
+        .from("submissions")
+        .select("tender_id")
+        .in("tender_id", tenderIds)
+        .in("status", ["submitted", "under_review"])
+        .limit(1),
+    ]);
+    submissionsToReview = countRes.count ?? 0;
+    const first = oneRes.data?.[0];
+    if (first?.tender_id) firstTenderIdWithSubmissionsToReview = first.tender_id;
   }
 
   return {
     vendorsPending: vendorsRes.count ?? 0,
     questionsPending: 0,
     submissionsToReview,
+    firstTenderIdWithSubmissionsToReview,
+    firstTenderIdWithPendingQuestions: null,
   };
 }
 
@@ -154,6 +173,7 @@ export async function getTendersWithMeta(
       : 0;
     const pendingWork =
       (submissionCountByTender[t.id] ?? 0) + pendingVendorsForTender;
+    const submissionCount = vendorIds?.size ?? 0;
 
     const year = new Date(t.created_at).getFullYear();
     const seq = String(tenders.length - index).padStart(3, "0");
@@ -166,6 +186,7 @@ export async function getTendersWithMeta(
       nextDeadlineDate,
       pendingWork,
       tenderNumber,
+      submissionCount,
     };
   });
 }

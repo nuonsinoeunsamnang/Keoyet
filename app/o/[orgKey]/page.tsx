@@ -163,7 +163,7 @@ export default async function OrgDashboardPage({
                   {counts.vendorsPending !== 1 ? "s" : ""} pending verification
                 </div>
               </div>
-              <Link href={`/o/${orgKey}/vendors`}>
+              <Link href={`/o/${orgKey}/vendors?status=pending`}>
                 <Button
                   style={{
                     background: theme.orange,
@@ -230,19 +230,38 @@ export default async function OrgDashboardPage({
                   {counts.questionsPending !== 1 ? "s" : ""} pending response
                 </div>
               </div>
-              <Button
-                style={{
-                  background: theme.blue,
-                  color: theme.white,
-                  border: "none",
-                  borderRadius: 6,
-                  padding: "0.375rem 0.75rem",
-                  fontSize: "0.875rem",
-                }}
-                disabled
-              >
-                Review
-              </Button>
+              {counts.firstTenderIdWithPendingQuestions ? (
+                <Link
+                  href={`/o/${orgKey}/tenders/${counts.firstTenderIdWithPendingQuestions}/manage/qa?filter=pending`}
+                >
+                  <Button
+                    style={{
+                      background: theme.blue,
+                      color: theme.white,
+                      border: "none",
+                      borderRadius: 6,
+                      padding: "0.375rem 0.75rem",
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                    Review
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  style={{
+                    background: theme.blue,
+                    color: theme.white,
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "0.375rem 0.75rem",
+                    fontSize: "0.875rem",
+                  }}
+                  disabled
+                >
+                  Review
+                </Button>
+              )}
             </Card>
 
             <Card
@@ -296,7 +315,13 @@ export default async function OrgDashboardPage({
                   {counts.submissionsToReview !== 1 ? "s" : ""} received
                 </div>
               </div>
-              <Link href={`/o/${orgKey}/tenders`}>
+              <Link
+                href={
+                  counts.firstTenderIdWithSubmissionsToReview
+                    ? `/o/${orgKey}/tenders/${counts.firstTenderIdWithSubmissionsToReview}/manage/submissions?filter=new`
+                    : `/o/${orgKey}/tenders`
+                }
+              >
                 <Button
                   style={{
                     background: theme.green,

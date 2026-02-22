@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { theme } from "@/lib/theme";
 
 export type ItemRow = {
@@ -186,9 +187,15 @@ function ItemImageCell({
   imageUrl: string;
   onChange: (url: string) => void;
 }) {
+  const [loadError, setLoadError] = useState(false);
+  const url = (imageUrl ?? "").trim();
   const validUrl =
-    imageUrl.trim().length > 0 &&
-    (imageUrl.startsWith("http://") || imageUrl.startsWith("https://"));
+    url.length > 0 &&
+    (url.startsWith("http://") || url.startsWith("https://"));
+
+  useEffect(() => {
+    setLoadError(false);
+  }, [url]);
 
   return (
     <div
@@ -200,23 +207,53 @@ function ItemImageCell({
       }}
     >
       {validUrl && (
-        <img
-          src={imageUrl}
-          alt=""
+        <div
           style={{
             width: 48,
             height: 48,
-            objectFit: "cover",
             borderRadius: 6,
             border: `1px solid ${theme.grayInputBorder}`,
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: theme.grayBg,
           }}
-          onError={() => {}}
-        />
+        >
+          {loadError ? (
+            <span
+              style={{
+                fontSize: "0.625rem",
+                color: theme.grayMuted,
+                textAlign: "center",
+                padding: 4,
+              }}
+              title={url}
+            >
+              Image unavailable
+            </span>
+          ) : (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={url}
+              alt=""
+              style={{
+                width: 48,
+                height: 48,
+                objectFit: "cover",
+              }}
+              onError={() => setLoadError(true)}
+            />
+          )}
+        </div>
       )}
       <input
         type="url"
-        value={imageUrl}
-        onChange={(e) => onChange(e.target.value)}
+        value={imageUrl ?? ""}
+        onChange={(e) => {
+          setLoadError(false);
+          onChange(e.target.value);
+        }}
         placeholder="Image URL (optional)"
         style={{ ...inputStyle, minWidth: 0 }}
       />
