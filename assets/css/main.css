@@ -568,6 +568,89 @@ body {
   color: var(--color-text-muted);
 }
 
+/* Submit page (procurement intake) */
+.submit-page .page-title {
+  margin-bottom: 0.5rem;
+}
+
+.submit-page .page-intro {
+  margin-bottom: var(--spacing);
+}
+
+.submit-checklist-title {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.submit-checklist-intro {
+  margin: 0 0 0.75rem;
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+}
+
+.submit-checklist {
+  margin: 0 0 1.5rem;
+  padding-left: 1.25rem;
+}
+
+.submit-checklist li {
+  margin: 0.35rem 0;
+}
+
+.callout {
+  margin: 0 0 var(--spacing);
+  padding: 1rem 1.25rem;
+  background: #f0f4ff;
+  border: 1px solid #c5daf5;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+}
+
+.callout p:first-child {
+  margin-top: 0;
+}
+
+.callout ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.callout li {
+  margin: 0.25rem 0;
+}
+
+.callout-warning {
+  background: #fff8e6;
+  border-color: #e6c84a;
+}
+
+.callout code {
+  font-size: 0.875em;
+  padding: 0.1rem 0.35rem;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 3px;
+}
+
+.form-embed {
+  width: 100%;
+  min-height: 900px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+.form-embed iframe {
+  display: block;
+  width: 100%;
+  min-height: 900px;
+  height: 100%;
+  border: 0;
+  overflow-x: hidden;
+}
+
 /* Mobile */
 @media (max-width: 640px) {
   .main {
@@ -580,5 +663,10 @@ body {
 
   .search-input {
     max-width: none;
+  }
+
+  .form-embed,
+  .form-embed iframe {
+    min-height: 800px;
   }
 }
