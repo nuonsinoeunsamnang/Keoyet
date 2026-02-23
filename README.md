@@ -91,6 +91,23 @@ scope:
 - The site adds `?tender_id=<tender_id>` (or `&tender_id=...` if the base URL already contains `?`).
 - If `vendor_form.base_url` is missing or empty, the CTA is hidden and a short note is shown: "Vendor response form not available."
 
+## Procurement Intake (Phase 0)
+
+The site has a public intake page at **/submit/** where procurement officers can upload tender documents. There is no authentication; access is controlled by sharing the `/submit` URL only with trusted procurement contacts.
+
+### How it works
+
+1. **Create a form** in Tally.so (preferred) or Google Forms with file upload enabled.
+2. **Configure the site:** In `submit.md` front matter, set `form_url` to your form’s embed or share URL (e.g. Tally form URL or Google Form “embed” link). Set `form_provider` to `tally` or `google` for your own reference.
+3. **Form fields to include:** Organization name (required), tender title, tender reference number, deadline (date/time/timezone), submission method (email/physical/both), contact person and phone/email, notes, and **file upload (multiple, required)**. The submit page lists these as a checklist for submitters.
+4. **Storage and notifications:** Tally stores uploads in your Tally account and can email you on each submission; Google Forms stores files in Google Drive and can notify you by email. Configure notifications in the form provider.
+5. **After a submission:** You receive an email and a new row in the form’s spreadsheet (Tally or Google Sheets). Create a new tender file: `cp _templates/tender.md _tenders/<id>.md`, fill it from the submission (add attachment links from Tally/Drive), set `published: true` when ready, then commit and push.
+
+### Security
+
+- No login is required on the site. Keep the intake URL private (share only with procurement officers).
+- Optionally add a simple anti-spam measure in the form (e.g. Tally’s hidden field / honeypot if supported). No backend or plugins are used.
+
 ## Deploy (GitHub Pages)
 
 1. In the repo: **Settings → Pages**.
@@ -148,6 +165,7 @@ The body of the file can contain extra Markdown (longer scope, notes, figures, e
 ## URLs
 
 - Homepage: `/`
+- Submit tender documents: `/submit/`
 - Tender detail: `/tenders/<slug>/` (slug = filename without `.md`)
 - 404: `/404.html`
 
