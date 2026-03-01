@@ -660,9 +660,7 @@ body {
   min-height: 900px;
   margin: 0;
   overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: #fafafa;
+  background: transparent;
 }
 
 .form-embed iframe {
