@@ -1,0 +1,66 @@
+---
+layout: default
+---
+
+{% comment %} Find tender doc: submit-bid page basename (e.g. fh-2026-0001) must match the tender. Match by URL path (e.g. /tenders/fh-2026-0001/) or slug/basename. {% endcomment %}
+{% assign tender_slug = page.basename %}
+{% assign tender_doc = nil %}
+{% for doc in site.tenders %}
+  {% if doc.url contains tender_slug %}
+    {% assign tender_doc = doc %}
+  {% endif %}
+{% endfor %}
+{% if tender_doc == nil %}
+  {% for doc in site.tenders %}
+    {% if doc.slug == tender_slug or doc.basename == tender_slug %}
+      {% assign tender_doc = doc %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+<article class="submit-bid-page wrap">
+  {% if tender_doc %}
+    <header class="submit-bid-header">
+      <p class="submit-bid-back"><a href="{{ tender_doc.url | relative_url }}">&larr; Back to tender</a></p>
+      <h1 class="submit-bid-title">{{ tender_doc.title }}</h1>
+      {% if tender_doc.tender_ref %}
+        <p class="submit-bid-meta"><span class="tender-ref">{{ tender_doc.tender_ref }}</span></p>
+      {% endif %}
+    </header>
+    <div class="submit-bid-form-wrap">
+      {% assign embed_base = site.vendor_bid_form.embed_src | default: "https://tally.so/embed/eqB96x?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1&formEventsForwarding=1" %}
+      {% assign embed_url = embed_base | append: "&tender_id=" | append: tender_doc.tender_id | append: "&source=keoyet_tender_page" %}
+      {% if tender_doc.tender_ref and tender_doc.tender_ref != "" %}
+        {% assign ref_safe = tender_doc.tender_ref | replace: "&", "%26" | replace: "=", "%3D" %}
+        {% assign embed_url = embed_url | append: "&tender_ref=" | append: ref_safe %}
+      {% endif %}
+      {% if tender_doc.title and tender_doc.title != "" %}
+        {% assign title_safe = tender_doc.title | replace: "&", "%26" | replace: "=", "%3D" | replace: " ", "+" %}
+        {% assign embed_url = embed_url | append: "&tender_title=" | append: title_safe %}
+      {% endif %}
+      <iframe
+        data-tally-src="{{ embed_url }}"
+        loading="lazy"
+        width="100%"
+        height="985"
+        frameborder="0"
+        marginheight="0"
+        marginwidth="0"
+        title="Submit Bid Online (Pilot)"
+      ></iframe>
+    </div>
+    <p class="submit-bid-note">Please also follow the official submission method stated in the tender notice.</p>
+  {% else %}
+    <p>Tender not found.</p>
+  {% endif %}
+</article>
+<script>
+(function(){
+  var d=document,w="https://tally.so/widgets/embed.js",v=function(){
+    if(typeof Tally!=="undefined")Tally.loadEmbeds();
+    else d.querySelectorAll("iframe[data-tally-src]:not([src])").forEach(function(e){e.src=e.dataset.tallySrc});
+  };
+  if(typeof Tally!=="undefined")v();
+  else if(!d.querySelector('script[src="'+w+'"]')){var s=d.createElement("script");s.src=w;s.onload=v;s.onerror=v;d.body.appendChild(s);}
+})();
+</script>

@@ -68,6 +68,35 @@ layout: default
       {% else %}
       <p class="tender-cta-note"><span class="tender-lang-en">Vendor response form not available.</span><span class="tender-lang-km">ទម្រង់ឆ្លើយតបរបស់អ្នកផ្គត់ផ្គង់មិនមាន។</span></p>
       {% endif %}
+
+      {% assign bid_base = page.vendor_bid_form.base_url | default: site.vendor_bid_form.base_url | default: "" | strip %}
+      {% assign bid_enabled = page.vendor_bid_form.enabled | default: false %}
+      {% assign bid_url = "" %}
+      {% if bid_enabled and bid_base != "" and page.tender_id and page.tender_id != "" %}
+        {% if bid_base contains "?" %}
+          {% assign bid_url = bid_base | append: "&tender_id=" | append: page.tender_id %}
+        {% else %}
+          {% assign bid_url = bid_base | append: "?tender_id=" | append: page.tender_id %}
+        {% endif %}
+        {% assign bid_url = bid_url | append: "&source=keoyet_tender_page" %}
+        {% if page.tender_ref and page.tender_ref != "" %}
+          {% assign ref_safe = page.tender_ref | replace: "&", "%26" | replace: "=", "%3D" %}
+          {% assign bid_url = bid_url | append: "&tender_ref=" | append: ref_safe %}
+        {% endif %}
+        {% if page.title and page.title != "" %}
+          {% assign title_safe = page.title | replace: "&", "%26" | replace: "=", "%3D" | replace: " ", "+" %}
+          {% assign bid_url = bid_url | append: "&tender_title=" | append: title_safe %}
+        {% endif %}
+        {% assign bid_page_url = "/submit-bid/" | append: page.slug | append: "/" | relative_url %}
+      {% endif %}
+      {% if bid_url != "" %}
+      <div class="tender-pilot">
+        <p class="tender-cta">
+          <a class="btn btn-secondary" href="{{ bid_page_url }}">Submit Bid Online</a>
+        </p>
+        <p class="tender-pilot-note">Online submission pilot — please still follow the official submission instructions in this tender notice.</p>
+      </div>
+      {% endif %}
     </header>
 
     {% if page.summary %}
@@ -208,6 +237,12 @@ layout: default
         <strong><span class="tender-lang-en">Clarification emails:</span><span class="tender-lang-km">អ៉ីមែលសុំពន្យល់៖</span></strong> {% for e in page.submission.clarification_emails %}<a href="mailto:{{ e }}">{{ e }}</a>{% unless forloop.last %}, {% endunless %}{% endfor %}
         {% endif %}
       </p>
+      {% endif %}
+      {% if bid_url != "" %}
+      <div class="callout callout-pilot">
+        <p><span class="tender-lang-en">Online submission (Pilot): Upload your bid package <a href="{{ bid_page_url }}">here</a>.</span><span class="tender-lang-km">ដាក់ជាមតិអនឡាញ (ជំនាន់ពិសោធ)៖ ផ្ទុកឯកសារជាមតិរបស់អ្នក <a href="{{ bid_page_url }}">នៅទីនេះ</a>។</span></p>
+        <p class="tender-pilot-note">Please also follow the official submission method stated in this tender.</p>
+      </div>
       {% endif %}
     </section>
 
