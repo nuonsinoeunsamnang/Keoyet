@@ -91,6 +91,19 @@ scope:
 - The site adds `?tender_id=<tender_id>` (or `&tender_id=...` if the base URL already contains `?`).
 - If `vendor_form.base_url` is missing or empty, the CTA is hidden and a short note is shown: "Vendor response form not available."
 
+## Vendor bid form (online submission pilot)
+
+- Optional: use a Tally form to collect online bid submissions (vendor info + file upload) instead of only sealed envelope / physical drop-off.
+- In tender front matter:
+  ```yaml
+  vendor_bid_form:
+    enabled: true
+    base_url: "https://tally.so/r/XXXXXX"
+  ```
+- The layout appends query params: `tender_id`, `source=keoyet_tender_page`, and when present `tender_ref`, `tender_title`. In Tally, add hidden fields for those so submissions are tied to the tender.
+- Final link example: `https://tally.so/r/XXXXXX?tender_id=FH-2026-0001&source=keoyet_tender_page&tender_ref=...&tender_title=...`
+- If `enabled` is false or `base_url` is empty, the "Submit Bid Online" CTA and the pilot callout in Submission Instructions are hidden.
+
 ## Procurement Intake (Phase 0)
 
 The site has a public intake page at **/submit/** where procurement officers can upload tender documents. There is no authentication; access is controlled by sharing the `/submit` URL only with trusted procurement contacts.
@@ -155,6 +168,8 @@ Each tender is a Markdown file in `_tenders/` with at least:
 | `resources` | Optional | List of `{ label, url, note }` (e.g. Drive links, external docs). |
 | `attachments` | Optional | List of `label` and `url`. |
 | `vendor_form.base_url` | Optional | External form URL; `tender_id` is appended. |
+| `vendor_bid_form.enabled` | Optional | Set to `true` with `vendor_bid_form.base_url` to show "Submit Bid Online" (pilot). Layout appends `tender_id`, `source=keoyet_tender_page`, `tender_ref`, `tender_title`. |
+| `vendor_bid_form.base_url` | Optional | Tally (or other) form URL for online bid submission pilot. |
 | `location` | Optional | `province`, `district`, `address_text`, etc. |
 | `goods` | Optional | List of `{ description, specification, unit, qty }` for goods/items table. |
 

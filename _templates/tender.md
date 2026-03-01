@@ -48,6 +48,11 @@ deadline:
 vendor_form:
   base_url: "https://forms.gle/XXXX"
 
+# Optional: online bid submission pilot (e.g. Tally). Layout appends tender_id, source=keoyet_tender_page, tender_ref, tender_title.
+# vendor_bid_form:
+#   enabled: true
+#   base_url: "https://tally.so/r/XXXXXX"
+
 submission:
   methods: ["email"]
   rules:

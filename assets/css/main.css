@@ -331,6 +331,29 @@ body {
   border-top: 1px solid var(--color-border);
 }
 
+/* Pilot: Submit Bid Online */
+.tender-pilot {
+  margin-top: 1rem;
+}
+
+.tender-pilot .tender-cta {
+  margin-bottom: 0.35rem;
+}
+
+.tender-pilot-note {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.callout-pilot {
+  margin-top: 1rem;
+}
+
+.callout-pilot .tender-pilot-note {
+  margin-top: 0.5rem;
+}
+
 .tender-section {
   margin-bottom: 1.5rem;
 }
@@ -669,4 +692,45 @@ body {
   .form-embed iframe {
     min-height: 800px;
   }
+}
+
+/* Submit bid page (tender title + embedded Tally form) */
+.submit-bid-page {
+  padding-bottom: 3rem;
+}
+.submit-bid-header {
+  margin-bottom: var(--spacing);
+}
+.submit-bid-back {
+  margin-bottom: 0.5rem;
+}
+.submit-bid-back a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+.submit-bid-back a:hover {
+  color: var(--color-primary);
+}
+.submit-bid-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+.submit-bid-meta {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+.submit-bid-form-wrap {
+  margin: var(--spacing) 0;
+  min-height: 400px;
+}
+.submit-bid-form-wrap iframe {
+  display: block;
+  border: 0;
+}
+.submit-bid-note {
+  margin-top: var(--spacing);
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
 }

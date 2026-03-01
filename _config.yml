@@ -20,6 +20,12 @@ defaults:
     values:
       layout: tender
 
+# Vendor bid form (online submission pilot) – shared default; override per tender if needed
+vendor_bid_form:
+  base_url: "https://tally.so/r/eqB96x"
+  # Embed iframe (same form, for /submit-bid/:slug/ pages)
+  embed_src: "https://tally.so/embed/eqB96x?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1&formEventsForwarding=1"
+
 # Build
 markdown: kramdown
 highlighter: rouge
