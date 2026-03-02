@@ -732,3 +732,19 @@ body {
   font-size: 0.9375rem;
   color: var(--color-text-muted);
 }
+
+/* Submit received page (post-Tally redirect) */
+.processing-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 14px 0 6px;
+}
+
+.small {
+  font-size: 0.95rem;
+}
+
+.muted {
+  opacity: 0.75;
+}
