@@ -1,62 +1,151 @@
 ---
 layout: default
-search_data: true
+title: Keoyet — Digital tenders from existing documents
+landing: true
 ---
 
-<div class="home">
-  <div class="wrap">
-    <h1 class="page-title">Tenders</h1>
-    <p class="page-intro">Browse open tenders. Use the search box to filter by title, buyer, or location.</p>
+<main class="landing">
+  <section class="hero">
+    <div class="wrap landing-wrap">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <span class="badge">Digital tendering, without rework</span>
+          <h1 class="hero-title">Turn tender documents into a shareable online tender page.</h1>
+          <p class="hero-subtitle">
+            Procurement teams upload the documents they already have. Keoyet publishes a clean tender page with attachments
+            and vendor response links.
+          </p>
 
-    <div class="search-box-wrap">
-      <label for="tender-search" class="visually-hidden">Search tenders</label>
-      <input type="search" id="tender-search" class="search-input" placeholder="Search by title, buyer, or location..." aria-label="Search tenders">
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="{{ '/submit/' | relative_url }}">Submit tender documents</a>
+            <a class="btn btn-secondary" href="{{ '/tenders/' | relative_url }}">View tenders</a>
+          </div>
+
+        </div>
+
+        <div class="hero-card">
+          <div class="card">
+            <h3 class="card-title">What vendors get</h3>
+            <ul class="card-list">
+              <li>One link to view tender details</li>
+              <li>Attachments organized and downloadable</li>
+              <li>Clear deadline + submission instructions</li>
+              <li>Submit interest / bid online</li>
+            </ul>
+            <div class="card-cta">
+              <a class="btn btn-secondary btn-block" href="{{ '/tenders/' | relative_url }}">Open an example tender</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <div id="tender-list" class="tender-list">
-      {% assign published = site.tenders | where: "published", true | sort: "date_posted" | reverse %}
-      {% for tender in published %}
-      <article class="tender-card" data-searchable="{{ tender.title | downcase }} {{ tender.buyer.name | downcase }} {{ tender.location.province | downcase }} {{ tender.location.district | downcase }} {{ tender.location.address_text | downcase }}">
-        <h2 class="tender-card-title">
-          <a href="{{ tender.url | relative_url }}">{{ tender.title }}</a>
-        </h2>
-        <p class="tender-card-buyer">{{ tender.buyer.name }}</p>
-        {% if tender.location.province or tender.location.district %}
-        <p class="tender-card-location">
-          {% if tender.location.province %}{{ tender.location.province }}{% endif %}
-          {% if tender.location.district %} &ndash; {{ tender.location.district }}{% endif %}
-        </p>
-        {% endif %}
-        {% if tender.deadline.datetime %}
-        <p class="tender-card-deadline">
-          <strong>Deadline:</strong> <time datetime="{{ tender.deadline.datetime }}">{{ tender.deadline.datetime | date: "%b %d, %Y" }}</time>
-        </p>
-        {% endif %}
-        <p class="tender-card-actions">
-          <a class="btn btn-secondary" href="{{ tender.url | relative_url }}">View</a>
-        </p>
-      </article>
-      {% endfor %}
+  <section class="section" id="how">
+    <div class="wrap landing-wrap">
+      <h2 class="section-title">How it works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <path d="M12 18v-6"/>
+              <path d="M9 15l3 3 3-3"/>
+            </svg>
+          </div>
+          <div class="step-num">1</div>
+          <h3 class="step-title">Drop your documents</h3>
+          <p class="step-text">
+            Upload PDFs, DOCX, BOQ, drawings, and forms at <a href="{{ '/submit/' | relative_url }}">/submit</a>.
+          </p>
+        </div>
+        <div class="step">
+          <div class="step-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <div class="step-num">2</div>
+          <h3 class="step-title">We publish the tender page</h3>
+          <p class="step-text">
+            We extract the important details and create a shareable page with attachments.
+          </p>
+        </div>
+        <div class="step">
+          <div class="step-icon" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+          </div>
+          <div class="step-num">3</div>
+          <h3 class="step-title">Share + collect responses</h3>
+          <p class="step-text">
+            Post one link to your channels. Vendors can ask questions or submit online.
+          </p>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <noscript>
-      <p class="search-noscript">Search requires JavaScript. All published tenders are listed above.</p>
-    </noscript>
-  </div>
-</div>
+  <section class="section section-alt" id="for-procurement">
+    <div class="wrap landing-wrap">
+      <div class="two-col">
+        <div>
+          <h2 class="section-title">For procurement teams</h2>
+          <ul class="bullets">
+            <li>Stop rewriting tenders into multiple formats</li>
+            <li>Reduce missing details and confusion</li>
+            <li>Make deadlines + submission rules obvious</li>
+            <li>Share one link everywhere</li>
+          </ul>
+          <div class="inline-cta">
+            <a class="btn btn-primary" href="{{ '/submit/' | relative_url }}">Submit tender documents</a>
+          </div>
+        </div>
 
-<script type="application/json" id="tender-search-data">
-[
-  {% assign published = site.tenders | where: "published", true | sort: "date_posted" | reverse %}
-  {% for tender in published %}
-  {
-    "title": {{ tender.title | jsonify }},
-    "buyer": {{ tender.buyer.name | jsonify }},
-    "location": "{{ tender.location.province }} {{ tender.location.district }} {{ tender.location.address_text }}",
-    "deadline": {{ tender.deadline.datetime | date: "%Y-%m-%d" | jsonify }},
-    "url": {{ tender.url | relative_url | jsonify }},
-    "searchable": "{{ tender.title | downcase }} {{ tender.buyer.name | downcase }} {{ tender.location.province | downcase }} {{ tender.location.district | downcase }} {{ tender.location.address_text | downcase }}"
-  }{% unless forloop.last %},{% endunless %}
-  {% endfor %}
-]
-</script>
+        <div>
+          <h2 class="section-title">For vendors</h2>
+          <ul class="bullets">
+            <li>View tender details quickly</li>
+            <li>Download the right attachments</li>
+            <li>Ask questions without hunting contacts</li>
+            <li>Option to submit online (pilot)</li>
+          </ul>
+          <div class="inline-cta">
+            <a class="btn btn-secondary" href="{{ '/tenders/' | relative_url }}">Browse tenders</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="cta">
+    <div class="wrap landing-wrap">
+      <div class="cta-box">
+        <div class="cta-copy">
+          <h2 class="cta-title">Ready to publish your next tender?</h2>
+          <p class="cta-text">Upload your documents and we'll send back a shareable tender page link.</p>
+        </div>
+        <div class="cta-actions">
+          <a class="btn btn-primary" href="{{ '/submit/' | relative_url }}">Submit tender documents</a>
+          <a class="btn btn-secondary" href="{{ '/tenders/' | relative_url }}">See live tenders</a>
+        </div>
+      </div>
+
+      <footer class="landing-footer">
+        <p class="footer-text">
+          Contact: <a href="mailto:hello@keoyet.com">hello@keoyet.com</a>
+        </p>
+      </footer>
+    </div>
+  </section>
+</main>

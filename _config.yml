@@ -1,7 +1,7 @@
 # Keoyet Phase-0: Digital Tender Pages
 # Jekyll config for GitHub Pages
 
-title: "Keoyet Tenders"
+title: "Keoyet"
 description: "Public tender notices and submission information"
 baseurl: ""
 url: "https://tenders.keoyet.com"

@@ -1,0 +1,62 @@
+---
+layout: default
+search_data: true
+---
+
+<div class="home">
+  <div class="wrap">
+    <h1 class="page-title">Tenders</h1>
+    <p class="page-intro">Browse open tenders. Use the search box to filter by title, buyer, or location.</p>
+
+    <div class="search-box-wrap">
+      <label for="tender-search" class="visually-hidden">Search tenders</label>
+      <input type="search" id="tender-search" class="search-input" placeholder="Search by title, buyer, or location..." aria-label="Search tenders">
+    </div>
+
+    <div id="tender-list" class="tender-list">
+      {% assign published = site.tenders | where: "published", true | sort: "date_posted" | reverse %}
+      {% for tender in published %}
+      <article class="tender-card" data-searchable="{{ tender.title | downcase }} {{ tender.buyer.name | downcase }} {{ tender.location.province | downcase }} {{ tender.location.district | downcase }} {{ tender.location.address_text | downcase }}">
+        <h2 class="tender-card-title">
+          <a href="{{ tender.url | relative_url }}">{{ tender.title }}</a>
+        </h2>
+        <p class="tender-card-buyer">{{ tender.buyer.name }}</p>
+        {% if tender.location.province or tender.location.district %}
+        <p class="tender-card-location">
+          {% if tender.location.province %}{{ tender.location.province }}{% endif %}
+          {% if tender.location.district %} &ndash; {{ tender.location.district }}{% endif %}
+        </p>
+        {% endif %}
+        {% if tender.deadline.datetime %}
+        <p class="tender-card-deadline">
+          <strong>Deadline:</strong> <time datetime="{{ tender.deadline.datetime }}">{{ tender.deadline.datetime | date: "%b %d, %Y" }}</time>
+        </p>
+        {% endif %}
+        <p class="tender-card-actions">
+          <a class="btn btn-secondary" href="{{ tender.url | relative_url }}">View</a>
+        </p>
+      </article>
+      {% endfor %}
+    </div>
+
+    <noscript>
+      <p class="search-noscript">Search requires JavaScript. All published tenders are listed above.</p>
+    </noscript>
+  </div>
+</div>
+
+<script type="application/json" id="tender-search-data">
+[
+  {% assign published = site.tenders | where: "published", true | sort: "date_posted" | reverse %}
+  {% for tender in published %}
+  {
+    "title": {{ tender.title | jsonify }},
+    "buyer": {{ tender.buyer.name | jsonify }},
+    "location": "{{ tender.location.province }} {{ tender.location.district }} {{ tender.location.address_text }}",
+    "deadline": {{ tender.deadline.datetime | date: "%Y-%m-%d" | jsonify }},
+    "url": {{ tender.url | relative_url | jsonify }},
+    "searchable": "{{ tender.title | downcase }} {{ tender.buyer.name | downcase }} {{ tender.location.province | downcase }} {{ tender.location.district | downcase }} {{ tender.location.address_text | downcase }}"
+  }{% unless forloop.last %},{% endunless %}
+  {% endfor %}
+]
+</script>
