@@ -6,35 +6,70 @@ search_data: true
 <div class="home">
   <div class="wrap">
     <h1 class="page-title">Tenders</h1>
-    <p class="page-intro">Browse open tenders. Use the search box to filter by title, buyer, or location.</p>
+    <p class="page-intro">Browse open tenders. Use the search box to filter by title, buyer, or location. Filter by tender type below.</p>
 
-    <div class="search-box-wrap">
-      <label for="tender-search" class="visually-hidden">Search tenders</label>
-      <input type="search" id="tender-search" class="search-input" placeholder="Search by title, buyer, or location..." aria-label="Search tenders">
+    <div class="tender-filters">
+      <div class="search-box-wrap">
+        <label for="tender-search" class="visually-hidden">Search tenders</label>
+        <input type="search" id="tender-search" class="search-input" placeholder="Search by title, buyer, or location..." aria-label="Search tenders">
+      </div>
+      <div class="tender-type-filter-wrap">
+        <label for="tender-type-filter" class="visually-hidden">Filter by tender type</label>
+        <select id="tender-type-filter" class="tender-type-filter" aria-label="Filter by tender type">
+          <option value="">All types</option>
+          <option value="goods">Goods</option>
+          <option value="works">Works</option>
+          <option value="services">Services</option>
+        </select>
+      </div>
     </div>
 
     <div id="tender-list" class="tender-list">
       {% assign published = site.tenders | where: "published", true | sort: "date_posted" | reverse %}
       {% for tender in published %}
-      <article class="tender-card" data-searchable="{{ tender.title | downcase }} {{ tender.buyer.name | downcase }} {{ tender.location.province | downcase }} {{ tender.location.district | downcase }} {{ tender.location.address_text | downcase }}">
-        <h2 class="tender-card-title">
-          <a href="{{ tender.url | relative_url }}">{{ tender.title }}</a>
-        </h2>
-        <p class="tender-card-buyer">{{ tender.buyer.name }}</p>
-        {% if tender.location.province or tender.location.district %}
-        <p class="tender-card-location">
-          {% if tender.location.province %}{{ tender.location.province }}{% endif %}
-          {% if tender.location.district %} &ndash; {{ tender.location.district }}{% endif %}
-        </p>
-        {% endif %}
-        {% if tender.deadline.datetime %}
-        <p class="tender-card-deadline">
-          <strong>Deadline:</strong> <time datetime="{{ tender.deadline.datetime }}">{{ tender.deadline.datetime | date: "%b %d, %Y" }}</time>
-        </p>
-        {% endif %}
-        <p class="tender-card-actions">
-          <a class="btn btn-secondary" href="{{ tender.url | relative_url }}">View</a>
-        </p>
+      <article class="tender-card" data-searchable="{{ tender.title | downcase }} {{ tender.buyer.name | downcase }} {{ tender.summary | downcase }} {{ tender.location.province | downcase }} {{ tender.location.district | downcase }} {{ tender.location.address_text | downcase }} {% if tender.tender_type %}{{ tender.tender_type | downcase }}{% endif %} {% for tag in tender.categories %}{{ tag | downcase }} {% endfor %}" data-tender-type="{% if tender.tender_type %}{{ tender.tender_type | downcase }}{% endif %}">
+        <div class="tender-card-inner">
+          {% if tender.buyer.logo %}
+          <div class="tender-card-logo">
+            {% if tender.buyer.website %}
+            <a href="{{ tender.buyer.website }}" target="_blank" rel="noopener noreferrer" class="tender-card-logo-link" aria-label="Visit {{ tender.buyer.name }} website">
+              <img src="{{ tender.buyer.logo | relative_url }}" alt="" width="48" height="48" loading="lazy">
+            </a>
+            {% else %}
+            <img src="{{ tender.buyer.logo | relative_url }}" alt="" width="48" height="48" loading="lazy">
+            {% endif %}
+          </div>
+          {% endif %}
+          <div class="tender-card-body">
+            <h2 class="tender-card-title">
+              <a href="{{ tender.url | relative_url }}">{{ tender.title }}</a>
+            </h2>
+            <p class="tender-card-buyer">{{ tender.buyer.name }}</p>
+            {% if tender.summary %}
+            <p class="tender-card-summary">{{ tender.summary }}</p>
+            {% endif %}
+            {% if tender.location.province or tender.location.district %}
+            <p class="tender-card-location">
+              {% if tender.location.province %}{{ tender.location.province }}{% endif %}
+              {% if tender.location.district %} &ndash; {{ tender.location.district }}{% endif %}
+            </p>
+            {% endif %}
+            {% if tender.tender_type or tender.categories.size > 0 %}
+            <p class="tender-card-tags">
+              {% if tender.tender_type %}<span class="tender-type tender-type-{{ tender.tender_type | downcase }}">{{ tender.tender_type }}</span>{% endif %}
+              {% for tag in tender.categories %}<span class="tender-tag">{{ tag }}</span>{% endfor %}
+            </p>
+            {% endif %}
+            {% if tender.deadline.datetime %}
+            <p class="tender-card-deadline">
+              <strong>Deadline:</strong> <time datetime="{{ tender.deadline.datetime }}">{{ tender.deadline.datetime | date: "%b %d, %Y at %I:%M %p" }}</time>{% if tender.deadline.timezone_label %} ({{ tender.deadline.timezone_label }}){% endif %}
+            </p>
+            {% endif %}
+            <p class="tender-card-actions">
+              <a class="btn btn-secondary" href="{{ tender.url | relative_url }}">View</a>
+            </p>
+          </div>
+        </div>
       </article>
       {% endfor %}
     </div>
