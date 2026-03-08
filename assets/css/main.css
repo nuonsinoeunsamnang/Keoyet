@@ -762,6 +762,21 @@ body {
   border-radius: 3px;
 }
 
+/* Tender detail: Airtable embed (when tender has goods/items) */
+.airtable-embed-wrap {
+  width: 100%;
+  margin-top: var(--spacing);
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid var(--color-border, #e0e0e0);
+}
+.airtable-embed-wrap .airtable-embed {
+  display: block;
+  width: 100%;
+  min-height: 400px;
+  border: 0;
+}
+
 .form-embed {
   width: 100%;
   min-height: 900px;

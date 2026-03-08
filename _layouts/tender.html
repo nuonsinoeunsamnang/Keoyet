@@ -176,6 +176,23 @@ layout: default
     </section>
     {% endif %}
 
+    {% if page.airtable_items_embed_src and page.airtable_items_embed_src != "" %}
+    <section class="tender-section tender-goods-section">
+      <h2><span class="tender-lang-en">Goods / Items</span><span class="tender-lang-km">ផលិតផល / របស់</span></h2>
+      <div class="airtable-embed-wrap">
+        <iframe
+          class="airtable-embed"
+          src="{{ page.airtable_items_embed_src }}"
+          frameborder="0"
+          width="100%"
+          height="533"
+          style="background: transparent; border: 1px solid #ccc;"
+          title="Tender goods and items (Airtable)"
+        ></iframe>
+      </div>
+    </section>
+    {% endif %}
+
     {% if page.contacts and page.contacts.size > 0 %}
     <section class="tender-section">
       <h2><span class="tender-lang-en">Contacts</span><span class="tender-lang-km">ទំនាក់ទំនង</span></h2>
