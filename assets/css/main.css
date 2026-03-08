@@ -106,8 +106,17 @@ body {
   color: var(--color-text-muted);
 }
 
-.search-box-wrap {
+.tender-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing);
+  align-items: flex-end;
   margin-bottom: var(--spacing);
+}
+
+.search-box-wrap {
+  flex: 1;
+  min-width: 200px;
 }
 
 .search-input {
@@ -118,6 +127,27 @@ body {
   font-family: inherit;
   border: 1px solid var(--color-border);
   border-radius: 4px;
+}
+
+.tender-type-filter-wrap {
+  flex-shrink: 0;
+}
+
+.tender-type-filter {
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  min-width: 140px;
+}
+
+.tender-type-filter:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
 }
 
 .search-input:focus {
@@ -143,6 +173,36 @@ body {
   display: none;
 }
 
+.tender-card-inner {
+  display: flex;
+  gap: var(--spacing);
+}
+
+.tender-card-logo {
+  flex-shrink: 0;
+}
+
+.tender-card-logo-link {
+  display: block;
+  text-decoration: none;
+}
+
+.tender-card-logo-link:hover img {
+  opacity: 0.85;
+}
+
+.tender-card-logo img {
+  display: block;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.tender-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
 .tender-card-title {
   margin: 0 0 0.5rem;
   font-size: 1.125rem;
@@ -161,14 +221,55 @@ body {
 
 .tender-card-buyer,
 .tender-card-location,
+.tender-card-summary,
 .tender-card-deadline {
   margin: 0.25rem 0;
   font-size: 0.9375rem;
   color: var(--color-text-muted);
 }
 
+.tender-card-summary {
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .tender-card-deadline strong {
   color: var(--color-text);
+}
+
+.tender-card-tags {
+  margin: 0.35rem 0;
+  font-size: 0.8125rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.tender-type,
+.tender-tag {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.tender-type {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.tender-type-goods { background: #059669; }
+.tender-type-works { background: #b45309; }
+.tender-type-services { background: var(--color-primary); }
+
+.tender-tag {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .tender-card-actions {

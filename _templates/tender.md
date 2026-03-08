@@ -14,11 +14,16 @@ issue_date: 2026-01-01
 
 buyer:
   name: "Full organization name"
+  # logo: "/assets/logos/org.svg"   # optional; URL or path to org logo (shown on list card)
   # name_km: "..."  # optional; or use buyer_km.name below
   address: "Street, City, Country"
   phone: []
   email: ["procurement@example.org"]
   website: "https://example.org"
+
+# Tender type: one of "Goods", "Works", "Services". Categories: free-form tags (e.g. Audit, Construction, Printing).
+# tender_type: "Services"
+# categories: ["Audit", "Capacity Building"]
 
 # buyer_km:           # optional Khmer
 #   name: "..."

@@ -2,6 +2,7 @@
   "use strict";
 
   var searchInput = document.getElementById("tender-search");
+  var typeFilter = document.getElementById("tender-type-filter");
   var tenderList = document.getElementById("tender-list");
   var cards = tenderList ? tenderList.querySelectorAll(".tender-card") : [];
   var dataEl = document.getElementById("tender-search-data");
@@ -19,26 +20,27 @@
     return (s || "").toLowerCase().trim();
   }
 
-  function filterCards(query) {
-    var q = normalize(query);
-    if (q === "") {
-      cards.forEach(function (card) {
-        card.classList.remove("hidden");
-      });
-      return;
-    }
-    cards.forEach(function (card, i) {
+  function filterCards() {
+    var q = normalize(searchInput ? searchInput.value : "");
+    var typeValue = typeFilter ? (typeFilter.value || "").toLowerCase() : "";
+
+    cards.forEach(function (card) {
       var searchable = (card.getAttribute("data-searchable") || "").toLowerCase();
-      var show = searchable.indexOf(q) !== -1;
-      card.classList.toggle("hidden", !show);
+      var cardType = (card.getAttribute("data-tender-type") || "").toLowerCase();
+
+      var matchesSearch = q === "" || searchable.indexOf(q) !== -1;
+      var matchesType = typeValue === "" || cardType === typeValue;
+
+      card.classList.toggle("hidden", !(matchesSearch && matchesType));
     });
   }
 
-  searchInput.addEventListener("input", function () {
-    filterCards(searchInput.value);
-  });
+  if (searchInput) {
+    searchInput.addEventListener("input", filterCards);
+    searchInput.addEventListener("search", filterCards);
+  }
 
-  searchInput.addEventListener("search", function () {
-    filterCards(searchInput.value);
-  });
+  if (typeFilter) {
+    typeFilter.addEventListener("change", filterCards);
+  }
 })();
